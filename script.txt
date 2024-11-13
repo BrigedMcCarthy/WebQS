@@ -1,0 +1,39 @@
+Integrity drop 
+	alert at start of integrity drop, 75%, 50%, & 25%
+integrity monitering system fails and tries to reboot... Reboot fail integrity status UNKNOWN
+pressure monitering system failure, presure status unknown
+all facility scientific personel evac (11 min safe distance)
+code red issued by FAMS
+integ monitering system fail protocal issues code red
+reactor ops personel must attempt reactor shutdown before evac
+reactor destruction in T-10 minutes, shutdown expire in T-5
+the option to shutdown the dark matter reactor is now active the temperture must be bellow 3000 kelvin to allow for the combustion stall protocall to engage
+distress signal issued by reactor operations personel
+communications network down, attempting to reistablish connection with eastern seaboard commmunications diode
+turbine hall damage
+radiation alrt for reactor chamber
+dmr integrity dropping engage thermal systems
+attention facility maintance personel! please report status
+attention! facility critical please do not use f-u--ee-a-l-CHRSS
+FAAS error detected 
+severe system damage sh-sh-sh-ut-ut-ut-ut-ut-ut-ut-uting down
+Danger dmr explosion in T-5 minutes option to shutdown has now expired
+code black issued evac to tart zone
+DMR operations team evac
+Control systems error, reactor controls inresponsive to dark matter reactor primary control node
+
+attention all reactor operations personel this is our last chance to shutdown the dark matter reactor, climb onto the superstructure and eject all fuel cells within 1 to 3 seconds
+of each other to invoke a combustion stall failure and shut down the dark matter reactor, you have a minute good luck
+
+Dark matter pressure purging system is inefective pressure continuing to rise!
+
+code omni issused
+lockdown protocal will engage in 2 minutes
+high levels of radiation in reactor operations cavern
+catalyzer failure detected
+all alarms and alarm lights are now operating on emergency battery power
+all personel please procede to the nearest blast shelter
+lockdown protocal now active blast doors closing in t-1 minute
+attention blast doors closing in t-30 seconds
+attention all personel we are detecting high amounts of radiation in the core chamber, we are cutting our losses and sealing the door
+STRONG GRAVITATIONAL ANONOMY IN CORE CHAMBER
