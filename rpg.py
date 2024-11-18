@@ -8,7 +8,8 @@ import time
 
 
 
-WHITE_CYAN = "\x1b[1;34;44m" # I know its not white cyan! im to lazy to change it
+WHITE_CYAN = "\x1b[1;34;44m" # I know its not white cyan! im to lazy to change it 
+# (few weeks later) still not changing this goddamit
 RESET = "\x1b[1;0;0m"
 
 #DMR systems
@@ -30,7 +31,6 @@ def getname():
 
 uname = getname()
 
-os.system("clear") # for some reason removing this breaks the ascii logo
 print("Welcome " + uname + " to the Quantum Science Energy Reaserch Facility")
 print( RESET + """                     """ + WHITE_CYAN + """@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@""" + RESET + """
                     """ + WHITE_CYAN + """@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@""" + RESET + """
@@ -115,3 +115,5 @@ time.sleep(5)
 print("Attention reactor operations control room personel, you are instructed to attempt a reactor shutdown before evacuation the facility, attempting to flee will have you terminated on sight, this is your only warning.")
 time.sleep(3)
 print("Estimating time of reactor destruction...")
+time.sleep(4)
+des_choise = input("Dark matter reactor explosion will occur in T-10 minutes! the option to shut down the reactor core will expire in t-5 minutes ")
