@@ -1,2 +1,2 @@
-# Conditionals Unit Project
- Conditionals project for programming with python
+# Web QSERF
+Web version of QSERF for the loops project in computer programming
