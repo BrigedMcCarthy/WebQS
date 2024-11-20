@@ -15,6 +15,8 @@ def code_gen(n):
 
 
 option1 = 0
+integ = 100
+clock = 20
 
 uname = input("please enter your name: ")
 
@@ -38,11 +40,11 @@ else:
 time.sleep(4)
 print("Attention all reactor operations personel, we have discovered a fracture in the reactor coolant system")
 time.sleep(2)
-print("Attention! Dark matter reactor integrity at 75% Engage thermal systems!")
-time.sleep(3)
-print("Attention! Dark matter reactor integrity at 50% Engage thermal systems!")
-time.sleep(2)
-print("Attention! Dark matter reactor integrity at 25%")
+for i in range(4):
+    print("Reactor integrity at: ")
+    print(integ)
+    time.sleep(2)
+    integ -= 25
 time.sleep(3)
 print("Dark matter reactor integrity monitering systems failure, attempting to reboot!")
 time.sleep(4)
@@ -60,15 +62,15 @@ print("Attention reactor operations control room personel, you are instructed to
 time.sleep(3)
 print("Estimating time of reactor destruction...")
 time.sleep(4)
-print("Dark matter reactor explosion will occur in T-10 minutes! the option to shut down the reactor core will expire in t-5 minutes")
+print("Dark matter reactor explosion will occur in T-10 minutes! The option to shutdown the reactor core will expire in t-5 minutes")
 time.sleep(2)
 thermal_choice = int(input("Where do you want to look for the shutdown code? Option 1: Break room Option 2: Attempt to recover deleted shutdown code from mainframe Option 3: Dont look for code "))
 
 #thermal shutdown code options 
 
 if thermal_choice == 1:
-    print("You go into the break room and see a sticky note on the fridge with the numbers ")
-    thermal_purge_code()
+    print("You go into the break room and see a sticky note on the fridge")
+    print("Todays security code is 5-33-41-18")
 if thermal_choice == 2:
   print("You log into the mainframe and attempt to recover the shutdown code")
   print("=============")
@@ -81,3 +83,9 @@ if thermal_choice == 2:
     print(str(code_gen(7)))
 
   print("=============")
+
+  print("Get sometime to write the shutdown code down on. Ill give you 20 seconds")
+for i in range(21):
+    print(clock)
+    clock -= 1
+    time.sleep(1)

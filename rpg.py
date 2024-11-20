@@ -2,6 +2,7 @@
 # Briged McCarthy 2024
 
 # Project dependencies 
+
 import os
 import time
 
@@ -9,7 +10,7 @@ import time
 
 
 WHITE_CYAN = "\x1b[1;34;44m" # I know its not white cyan! im to lazy to change it 
-# (few weeks later) still not changing this goddamit
+# (few weeks later) still not changing the name.
 RESET = "\x1b[1;0;0m"
 
 #DMR systems
@@ -30,7 +31,7 @@ def getname():
     return uname
 
 uname = getname()
-
+os.system('clear') # For some reason removing this screws with the unicode colours
 print("Welcome " + uname + " to the Quantum Science Energy Reaserch Facility")
 print( RESET + """                     """ + WHITE_CYAN + """@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@""" + RESET + """
                     """ + WHITE_CYAN + """@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@""" + RESET + """
