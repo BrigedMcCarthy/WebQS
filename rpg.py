@@ -148,12 +148,17 @@ if thermal_choice == 2:
 
   print("=============")
 
+#Horrible way to check if the user inputed code is correct. ABSOLUTLY HORRIBLE. Keeping it though
 code_input = int(input("Type the shutdown code: "))
 result = int(shutdown_code)
-#print(result)
 code_check = result - code_input
-#print(code_check)
+#DONT REDO
+#CODE WORKS FINE
+#JUST VERY INEFFICIENT WAY OF DOING IT
+
 
 #shutdown sequence
 if code_check == 0:
-  print("Hello world")
+  print("Shutdown code accepted!\nAttempting reactor shutdown...")
+elif code_check != 0:
+  print("Shutdown code DENIED!\nCritical error: CODE NOT IN SYSTEM")
