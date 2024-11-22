@@ -1,2 +1,2 @@
 # WebQS
-Web version of QSERF for the loops project in computer programming
+QSERF reimagined as a text RPG

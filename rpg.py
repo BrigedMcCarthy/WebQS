@@ -5,8 +5,8 @@
 
 import os
 import time
-
-
+import random
+import math
 
 
 WHITE_CYAN = "\x1b[1;34;44m" # I know its not white cyan! im to lazy to change it 
@@ -17,6 +17,13 @@ RESET = "\x1b[1;0;0m"
 dmr_online = 0
 integrity = 100
 coolant = 0
+iteg = 100
+
+def code_gen(n):
+  code = ''
+  for i in range(n):
+    code = "".join([code, str(random.randint(1,9))]).lstrip()
+  return code
 #option menu
 
 usr = False
@@ -75,6 +82,7 @@ if dmr_key == "yes" or "y" or "Yes":
     time.sleep(3)
     dmr_online = 1
 # imported from testing 
+
 print("Hello " + uname + ", your shift will begin at the bell")
 time.sleep(2)
 print("*BELL*")
@@ -95,26 +103,57 @@ else:
 time.sleep(4)
 print("Attention all reactor operations personel, we have discovered a fracture in the reactor coolant system")
 time.sleep(2)
-print("Attention! Dark matter reactor integrity at 75% Engage thermal systems!")
-time.sleep(3)
-print("Attention! Dark matter reactor integrity at 50% Engage thermal systems!")
-time.sleep(2)
-print("Attention! Dark matter reactor integrity at 25%")
+for i in range(4):
+    print("Reactor integrity at: ")
+    print(integ)
+    time.sleep(2)
+    integ -= 25
 time.sleep(3)
 print("Dark matter reactor integrity monitering systems failure, attempting to reboot!")
 time.sleep(4)
 print("Reboot: Failure! integrity status UNKNOWN!")
 time.sleep(2)
 print("Pressure monitering systems failure! Pressure status UNKNOWN")
-time.sleep(4)
+time.sleep(2)
 print("All facility scientific personel please evacuate immediately! You have 11 minutes to reach minimum safe distance!")
-time.sleep(4)
+time.sleep(2)
 print("Attention all personel, a code red has been issues by the facility automated managment system, lockdown code has been overridden by the designated code bravo niner, please procede to the tarturus door for evacuation immediately, this is not a drill I repeat this is not a drill")
-time.sleep(4)
-print("ATTENTION! DARK MATTER REACTOR INTEGRITY MONTERING SYSTEM PREIMPTION PROTOCAL INITIATED, ENGAGING CODE RED EMERGENCY!")
-time.sleep(5)
+time.sleep(2)
+print("ATTENTION! DARK MATTER REACTOR INTEGRITY MONTERING SYSTEM PREEMPTION PROTOCAL INITIATED, ENGAGING CODE RED EMERGENCY!")
+time.sleep(2)
 print("Attention reactor operations control room personel, you are instructed to attempt a reactor shutdown before evacuation the facility, attempting to flee will have you terminated on sight, this is your only warning.")
-time.sleep(3)
+time.sleep(2)
 print("Estimating time of reactor destruction...")
 time.sleep(4)
-des_choise = input("Dark matter reactor explosion will occur in T-10 minutes! the option to shut down the reactor core will expire in t-5 minutes ")
+print("Dark matter reactor explosion will occur in T-10 minutes! The option to shutdown the reactor core will expire in t-5 minutes")
+time.sleep(2)
+thermal_choice = int(input("Where do you want to look for the shutdown code? Option 1: Break room Option 2: Attempt to recover deleted shutdown code from mainframe Option 3: Dont look for code "))
+
+#thermal shutdown code options 
+
+if thermal_choice == 1:
+    print("You go into the break room and see a sticky note on the fridge")
+    print("Todays security code is 5-33-41-18")
+if thermal_choice == 2:
+  print("You log into the mainframe and attempt to recover the shutdown code")
+  print("=============")
+  fail_chance = random.randint(1, 100) #fail_chance number choosen by @katsumi143 on discord
+  if fail_chance < math.pi:
+  #redundant because fail_chance can only be a int, use < 4
+    print(str(code_gen(5)))
+    print("ERROR RECOVERING DATA")
+  else:
+    shutdown_code = code_gen(7)
+    print(str(code_gen(7)))
+
+  print("=============")
+
+code_input = int(input("Type the shutdown code: "))
+result = int(shutdown_code)
+#print(result)
+code_check = result - code_input
+#print(code_check)
+
+#shutdown sequence
+if code_check == 0:
+  print("Hello world")

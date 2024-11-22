@@ -1,4 +1,4 @@
-# Used for testing parts of the main script
+# Used for testing code I want to put in the main script (rpg.py)
 # Test code below
 
 
@@ -9,14 +9,13 @@ import math
 def code_gen(n):
   code = ''
   for i in range(n):
-    code = " ".join([code, str(random.randint(1,9))]).lstrip()
+    code = "".join([code, str(random.randint(1,9))]).lstrip()
   return code
 
 
 
 option1 = 0
 integ = 100
-clock = 20
 
 uname = input("please enter your name: ")
 
@@ -51,15 +50,15 @@ time.sleep(4)
 print("Reboot: Failure! integrity status UNKNOWN!")
 time.sleep(2)
 print("Pressure monitering systems failure! Pressure status UNKNOWN")
-time.sleep(4)
+time.sleep(2)
 print("All facility scientific personel please evacuate immediately! You have 11 minutes to reach minimum safe distance!")
-time.sleep(4)
+time.sleep(2)
 print("Attention all personel, a code red has been issues by the facility automated managment system, lockdown code has been overridden by the designated code bravo niner, please procede to the tarturus door for evacuation immediately, this is not a drill I repeat this is not a drill")
-time.sleep(4)
+time.sleep(2)
 print("ATTENTION! DARK MATTER REACTOR INTEGRITY MONTERING SYSTEM PREEMPTION PROTOCAL INITIATED, ENGAGING CODE RED EMERGENCY!")
-time.sleep(5)
+time.sleep(2)
 print("Attention reactor operations control room personel, you are instructed to attempt a reactor shutdown before evacuation the facility, attempting to flee will have you terminated on sight, this is your only warning.")
-time.sleep(3)
+time.sleep(2)
 print("Estimating time of reactor destruction...")
 time.sleep(4)
 print("Dark matter reactor explosion will occur in T-10 minutes! The option to shutdown the reactor core will expire in t-5 minutes")
@@ -80,12 +79,17 @@ if thermal_choice == 2:
     print(str(code_gen(5)))
     print("ERROR RECOVERING DATA")
   else:
+    shutdown_code = code_gen(7)
     print(str(code_gen(7)))
 
   print("=============")
 
-  print("Get sometime to write the shutdown code down on. Ill give you 20 seconds")
-for i in range(21):
-    print(clock)
-    clock -= 1
-    time.sleep(1)
+code_input = int(input("Type the shutdown code: "))
+result = int(shutdown_code)
+#print(result)
+code_check = result - code_input
+#print(code_check)
+
+#shutdown sequence
+if code_check == 0:
+  print("Hello world")
