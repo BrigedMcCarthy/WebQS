@@ -33,4 +33,6 @@ code_check = result - code_input
 
 #shutdown sequence
 if code_check == 0:
-  print("Hello world")
+  print("Shutdown code accepted!\nAttempting reactor shutdown...")
+elif code_check != 0:
+  print("Shutdown code DENIED!\nCritical error: CODE NOT IN SYSTEM")
