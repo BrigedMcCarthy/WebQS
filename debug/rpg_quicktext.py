@@ -3,6 +3,7 @@
 
 # Project dependencies 
 
+from optparse import check_choice
 import os
 import time
 import random
@@ -60,7 +61,7 @@ print( RESET + """                     """ + WHITE_CYAN + """@@@@@@@@@@@@@@@@@@@
    """ + WHITE_CYAN + """@@@@@@@@@@@@@@@@@@@@@""" + RESET + """                  """ + WHITE_CYAN + """@@@@@@@@@@@@@@@""" + RESET + """
   """ + WHITE_CYAN + """@@@@@@@@@@@@@@@@@@@@@@""" + RESET + """                  """ + WHITE_CYAN + """@@@@@""" + RESET + """ """ + WHITE_CYAN + """@@@@@@@""" + RESET + """  
  """ + WHITE_CYAN + """@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@""" + RESET + """
-""" + WHITE_CYAN + """@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@""" + RESET + """ """) #this shit acts like text in a MS-WORD doc with an image when I remove the color
+""" + WHITE_CYAN + """@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@""" + RESET + """ """) #this crap acts like text in a MS-WORD doc with an image when I remove the color
 print(RESET)
 dmr_key = input("Turn the key to enable the DMR? ")
 # DMR startup
@@ -129,18 +130,25 @@ if thermal_choice == 2:
 #Horrible way to check if the user inputed code is correct. ABSOLUTLY HORRIBLE. Keeping it though
 code_input = int(input("Type the shutdown code: "))
 result = int(shutdown_code)
-code_check = result - code_input
-#DONT REDO
-#CODE WORKS FINE
+#code_check = result - code_input
+#DONT REDO (redoing it anyway so the compiler wont get confused)
+#CODE WORKS FINE (turns out that it does not work fine)
 #JUST VERY INEFFICIENT WAY OF DOING IT
 
+#print(code_check)
+print(result)
 
-#shutdown sequence
-if code_check == 0:
+result_check = 0
+
+if code_input == result:
+  print("Code correct!")
+
+#shutdown sequence 
+#なぜ働かないのですか!!!!
+if code_input == result:
   print("Shutdown code accepted!\nAttempting reactor shutdown...")
-elif code_check > 0:
-  print("Shutdown code DENIED!\nCritical error: CODE NOT IN SYSTEM")
-elif code_check < 0:
-  print("Shutdown code DENIED!\nCritical error: CODE NOT IN SYSTEM")
+#elif code_input is not result:
+  #print("Shutdown code DENIED!\nCritical error: CODE NOT IN SYSTEM")
 else:
-  print("You did not input a code")
+  #print("You did not input a code")
+  print("Shutdown code DENIED!\nCritical error: CODE NOT IN SYSTEM")
