@@ -7,7 +7,7 @@ import os
 import time
 import random
 import math
-
+from playsound import playsound
 
 WHITE_CYAN = "\x1b[1;34;44m" # I know its not white cyan! im to lazy to change it 
 # (few weeks later) still not changing it.
@@ -61,14 +61,16 @@ print( RESET + """                     """ + WHITE_CYAN + """@@@@@@@@@@@@@@@@@@@
   """ + WHITE_CYAN + """@@@@@@@@@@@@@@@@@@@@@@""" + RESET + """                  """ + WHITE_CYAN + """@@@@@""" + RESET + """ """ + WHITE_CYAN + """@@@@@@@""" + RESET + """  
  """ + WHITE_CYAN + """@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@""" + RESET + """
 """ + WHITE_CYAN + """@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@""" + RESET + """ """) #this shit acts like text in a MS-WORD doc with an image when I remove the color
-time.sleep(5)
+time.sleep(3)
 print(RESET)
 dmr_key = input("Turn the key to enable the DMR? ")
 # DMR startup
 if dmr_key == "yes" or "y" or "Yes":
     print("Reactor core ignition sequence primed, please vacate the core chamber immediately!")
+    playsound('Audio\key is online.wav')
     time.sleep(3)
     print("Gravitational lasers ONLINE, raising core superstructure to center position")
+    playsound('Audio\gravity laser.wav')
     time.sleep(2)
     print("Dark Matter reactor superstructure has been raised to center position")
     time.sleep(3)

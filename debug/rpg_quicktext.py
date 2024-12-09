@@ -8,6 +8,7 @@ import os
 import time
 import random
 import math
+import simpleaudio as sa
 
 
 WHITE_CYAN = "\x1b[1;34;44m" # I know its not white cyan! im to lazy to change it 
