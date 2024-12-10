@@ -17,7 +17,7 @@ RESET = "\x1b[1;0;0m"
 dmr_online = 0
 integrity = 100
 coolant = 0
-iteg = 100
+integ = 100
 
 def code_gen(n):
   code = ''
@@ -73,14 +73,13 @@ if dmr_key == "yes" or "y" or "Yes":
     playsound('Audio\gravity laser.wav')
     time.sleep(2)
     print("Dark Matter reactor superstructure has been raised to center position")
+    playsound('Audio\center position.wav')
     time.sleep(3)
     print("Activating power lasers...")
-    time.sleep(2)
-    print("Opening combustion intake valves...")
-    time.sleep(1)
+    playsound('Audio\startupopen.wav')
     print("Power lasers ONLINE.")
     time.sleep(2)
-    print("Dark Matter reactor ONLINE, converting power back to main facility grid ")
+    print("Dark Matter reactor ONLINE, converting power back to main facility grid")
     time.sleep(3)
     dmr_online = 1
 #DONT TOUCH ANYTHING BEFORE THIS COMMENT!
@@ -92,8 +91,10 @@ time.sleep(2)
 print("*BELL*")
 time.sleep(2)
 print("later that night...")
-time.sleep(2)
+playsound('Audio\Dark-Matter-Core-Temp-safe-limits.mp3')
+time.sleep(3)
 print("ATTENTION: DARK MATTER REACTOR INTEGRITY DROPPING! ENGAGE THERMAL SYSTEMS!")
+playsound('Audio\Integrity-dropping.mp3')
 usr = int(input("Do you: 1,Engage coolant to slow the loss of integrity. or 2, disregard the alert and continue operations: "))
 
 if usr == 1:
@@ -114,7 +115,8 @@ for i in range(4):
     integ -= 25
 time.sleep(3)
 print("Dark matter reactor integrity monitering systems failure, attempting to reboot!")
-time.sleep(4)
+playsound('Audio\Integrity-Monitoring-Failure.mp3')
+time.sleep(1)
 print("Reboot: Failure! integrity status UNKNOWN!")
 time.sleep(2)
 print("Pressure monitering systems failure! Pressure status UNKNOWN")
@@ -125,7 +127,7 @@ print("Attention all personel, a code red has been issues by the facility automa
 time.sleep(2)
 print("ATTENTION! DARK MATTER REACTOR INTEGRITY MONTERING SYSTEM PREEMPTION PROTOCAL INITIATED, ENGAGING CODE RED EMERGENCY!")
 time.sleep(2)
-print("Attention reactor operations control room personel, you are instructed to attempt a reactor shutdown before evacuation the facility, attempting to flee will have you terminated on sight, this is your only warning.")
+playsound('Audio\reactoropspersonnel.wav')
 time.sleep(2)
 print("Estimating time of reactor destruction...")
 time.sleep(4)
@@ -164,5 +166,6 @@ code_check = result - code_input
 #shutdown sequence
 if code_check == 0:
   print("Shutdown code accepted!\nAttempting reactor shutdown...")
+  playsound('Audio\Emergency-Shutdown-Activated.wav')
 elif code_check != 0:
   print("Shutdown code DENIED!\nCritical error: CODE NOT IN SYSTEM")
