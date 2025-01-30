@@ -1,5 +1,5 @@
 # QSERF text RPG
-# Briged McCarthy 2024
+# Briged McCarthy 2025
 
 # Project dependencies 
 
@@ -7,6 +7,7 @@ import os
 import time
 import random
 import math
+import sys
 from playsound import playsound
 
 WHITE_CYAN = "\x1b[1;34;44m" # I know its not white cyan! im to lazy to change it 
@@ -24,6 +25,17 @@ def code_gen(n):
   for i in range(n):
     code = "".join([code, str(random.randint(1,9))]).lstrip()
   return code
+
+
+#Human like typing code from https://stackoverflow.com/questions/4099422/printing-slowly-simulate-typing
+def sprint(str):
+   for c in str + '\n':
+     sys.stdout.write(c)
+     sys.stdout.flush()
+     time.sleep(1./100)
+
+esc = chr(27)
+print(f'a{esc}[5m_\u2592b\u2588{esc}[m_c')
 #option menu
 
 usr = False
@@ -38,31 +50,19 @@ def getname():
     return uname
 
 uname = getname()
-os.system('clear') # For some reason removing this screws with the unicode colours
 print("Welcome " + uname + " to the Quantum Science Energy Reaserch Facility")
-print( RESET + """                     """ + WHITE_CYAN + """@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@""" + RESET + """
-                    """ + WHITE_CYAN + """@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@""" + RESET + """
-          """ + WHITE_CYAN + """@@@@@@@@@@@@@"""+ RESET +"""                    """ + WHITE_CYAN + """@@@@@@@@@@@@@@@@@@@@@""" + RESET + """
-         """ + WHITE_CYAN + """@@@""" + RESET + """      """ + WHITE_CYAN + """@@@@@@@""" + RESET + """                """ + WHITE_CYAN + """@@@@@@@@@@@@@@@@@@@@@@""" + RESET + """
-         """+ WHITE_CYAN + """@@@""" + RESET + """     """ + WHITE_CYAN + """@@@@""" + RESET + """  """ + WHITE_CYAN + """@@@@@@@""" + RESET + """      """ + WHITE_CYAN + """@@@@@@@""" + RESET + """  """ + WHITE_CYAN + """@@@@@@@@@@@@@@@@@""" + RESET + """
-          """ + WHITE_CYAN + """@@@""" + RESET + """   """ + WHITE_CYAN + """@@@@""" + RESET + """        """ + WHITE_CYAN + """@@@@@@@@@@""" + RESET + """        """ + WHITE_CYAN + """@@@@@@@@@@@@@@@""" + RESET + """
-           """ + WHITE_CYAN + """@@@@@@@@""" + RESET + """          """ + WHITE_CYAN + """@@@@@@@@""" + RESET + """           """ + WHITE_CYAN + """@@@@@@@@@@@@@""" + RESET + """
-             """ + WHITE_CYAN + """@@@@@""" + RESET + """        """ + WHITE_CYAN + """@@@@@""" + RESET + """    """ + WHITE_CYAN + """@@@@@""" + RESET + """        """ + RESET + """ """ + WHITE_CYAN + """@@@@@@@@@@""" + RESET + """
-             """ + WHITE_CYAN + """@@@@@""" + RESET + """     """ + WHITE_CYAN + """@@@@@""" + RESET + """          """ + WHITE_CYAN + """@@@@@""" + RESET + """     """ + WHITE_CYAN + """@@@@@@@@@""" + RESET + """
-           """ + WHITE_CYAN + """@@@@@""" + RESET + """ """ + WHITE_CYAN + """@@@@@@@@""" + RESET + """       """ + WHITE_CYAN + """@@""" + RESET + """       """ + WHITE_CYAN + """@@@@@@@@""" + RESET + """ """ + WHITE_CYAN + """@@@@@@""" + RESET + """
-          """ + WHITE_CYAN + """@@@@@""" + RESET + """   """ + WHITE_CYAN + """@@@@@""" + RESET + """        """ + WHITE_CYAN + """@@@@""" + RESET + """        """ + WHITE_CYAN + """@@@@@""" + RESET + """   """ + WHITE_CYAN + """@@@@""" + RESET + """
-         """ + WHITE_CYAN + """@@@@@@@@@@@""" + RESET + """ """ + WHITE_CYAN + """@@@@@""" + RESET + """              """ + WHITE_CYAN + """@@@@@""" + RESET + """ """ + WHITE_CYAN + """@@@@@@@@""" + RESET + """
-        """ + WHITE_CYAN + """@@@@@@@@@@""" + RESET + """      """ + WHITE_CYAN + """@@@@""" + RESET + """          """ + WHITE_CYAN + """@@@@""" + RESET + """      """ + WHITE_CYAN + """@@@@@""" + RESET + """
-       """ + WHITE_CYAN + """@@@@@@@@@@@""" + RESET + """         """ + WHITE_CYAN + """@@@@@""" + RESET + """  """ + WHITE_CYAN + """@@@@@""" + RESET + """         """ + WHITE_CYAN + """@@@@@@""" + RESET + """
-      """ + WHITE_CYAN + """@@@@@@@@@@@@@""" + RESET + """           """ + WHITE_CYAN + """@@@@@@""" + RESET + """           """ + WHITE_CYAN + """@@@@""" + RESET + """ """ + WHITE_CYAN + """@@@""" + RESET + """  
-     """ + WHITE_CYAN + """@@@@@@@@@@@@@@@""" + RESET + """       """ + WHITE_CYAN + """@@@@@@@@@@@@""" + RESET + """       """ + WHITE_CYAN + """@@@@""" + RESET + """   """ + WHITE_CYAN + """@@@""" + RESET + """  
-    """ + WHITE_CYAN + """@@@@@@@@@@@@@@@@@@@@@@@@@""" + RESET + """        """ + WHITE_CYAN + """@@@@@@@@@@@@""" + RESET + """     """ + WHITE_CYAN + """@@@""" + RESET + """
-   """ + WHITE_CYAN + """@@@@@@@@@@@@@@@@@@@@@""" + RESET + """                  """ + WHITE_CYAN + """@@@@@@@@@@@@@@@""" + RESET + """
-  """ + WHITE_CYAN + """@@@@@@@@@@@@@@@@@@@@@@""" + RESET + """                  """ + WHITE_CYAN + """@@@@@""" + RESET + """ """ + WHITE_CYAN + """@@@@@@@""" + RESET + """  
- """ + WHITE_CYAN + """@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@""" + RESET + """
-""" + WHITE_CYAN + """@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@""" + RESET + """ """) #this shit acts like text in a MS-WORD doc with an image when I remove the color
-time.sleep(3)
-print(RESET)
+sprint('''
+▀▀▀▀▀▀▀▀▀▀▀  ▀▀▀▀▀▀▀▀▀▀▀▀      ▀▀▀▀▀▀▀▀      ▀▀▀▀▀▀▀▀
+▀▀▀▀▀▀▀▀▀▀▀  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   ▀▀▀▀▀▀▀▀▀    ▀▀▀▀▀▀▀▀▀
+   ▀▀▀▀▀        ▀▀▀▀   ▀▀▀▀▀     ▀▀▀▀▀▀▀▀  ▀▀▀▀▀▀▀▀
+   ▀▀▀▀▀        ▀▀▀▀▀▀▀▀▀▀▀      ▀▀▀▀  ▀▀▀ ▀▀▀ ▀▀▀▀
+   ▀▀▀▀▀        ▀▀▀▀▀▀▀▀▀▀▀      ▀▀▀▀  ▀▀▀▀▀▀▀ ▀▀▀▀
+   ▀▀▀▀▀        ▀▀▀▀   ▀▀▀▀▀     ▀▀▀▀   ▀▀▀▀▀  ▀▀▀▀
+▀▀▀▀▀▀▀▀▀▀▀  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   ▀▀▀▀▀▀    ▀▀▀   ▀▀▀▀▀▀
+▀▀▀▀▀▀▀▀▀▀▀  ▀▀▀▀▀▀▀▀▀▀▀▀      ▀▀▀▀▀▀     ▀    ▀▀▀▀▀▀
+''')
+
+
 dmr_key = input("Turn the key to enable the DMR? ")
 # DMR startup
 if dmr_key == "yes" or "y" or "Yes":
@@ -127,7 +127,6 @@ print("Attention all personel, a code red has been issues by the facility automa
 time.sleep(2)
 print("ATTENTION! DARK MATTER REACTOR INTEGRITY MONTERING SYSTEM PREEMPTION PROTOCAL INITIATED, ENGAGING CODE RED EMERGENCY!")
 time.sleep(2)
-playsound('Audio\reactoropspersonnel.wav')
 time.sleep(2)
 print("Estimating time of reactor destruction...")
 time.sleep(4)
@@ -166,6 +165,6 @@ code_check = result - code_input
 #shutdown sequence
 if code_check == 0:
   print("Shutdown code accepted!\nAttempting reactor shutdown...")
-  playsound('Audio\Emergency-Shutdown-Activated.wav')
+  playsound('Audio\eme_shutdown.mp3')
 elif code_check != 0:
   print("Shutdown code DENIED!\nCritical error: CODE NOT IN SYSTEM")
