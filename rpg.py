@@ -34,6 +34,18 @@ def sprint(str):
      sys.stdout.flush()
      time.sleep(1./100)
 
+def sprint_welcome(str):
+   for c in str + '\n':
+     sys.stdout.write(c)
+     sys.stdout.flush()
+     time.sleep(1./20)
+
+def sprint_name(str):
+   for c in str + '\n':
+     sys.stdout.write(c)
+     sys.stdout.flush()
+     time.sleep(1./10)
+
 esc = chr(27)
 print(f'a{esc}[5m_\u2592b\u2588{esc}[m_c')
 #option menu
@@ -50,7 +62,6 @@ def getname():
     return uname
 
 uname = getname()
-print("Welcome " + uname + " to the Quantum Science Energy Reaserch Facility")
 sprint('''
 ▀▀▀▀▀▀▀▀▀▀▀  ▀▀▀▀▀▀▀▀▀▀▀▀      ▀▀▀▀▀▀▀▀      ▀▀▀▀▀▀▀▀
 ▀▀▀▀▀▀▀▀▀▀▀  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   ▀▀▀▀▀▀▀▀▀    ▀▀▀▀▀▀▀▀▀
@@ -61,6 +72,9 @@ sprint('''
 ▀▀▀▀▀▀▀▀▀▀▀  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   ▀▀▀▀▀▀    ▀▀▀   ▀▀▀▀▀▀
 ▀▀▀▀▀▀▀▀▀▀▀  ▀▀▀▀▀▀▀▀▀▀▀▀      ▀▀▀▀▀▀     ▀    ▀▀▀▀▀▀
 ''')
+sprint_welcome('''Microsoft (R) MS-DOS (R) Version 3.11
+(C) Copyright Quantum Corp 1981-1985''')
+sprint_name("CURRENT USER: " + uname)
 
 
 dmr_key = input("Turn the key to enable the DMR? ")
