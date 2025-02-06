@@ -8,6 +8,7 @@ import time
 import random
 import math
 import sys
+import playsound
 from playsound import playsound
 
 WHITE_CYAN = "\x1b[1;34;44m" # I know its not white cyan! im to lazy to change it 
@@ -72,7 +73,7 @@ sprint('''
 ▀▀▀▀▀▀▀▀▀▀▀  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   ▀▀▀▀▀▀    ▀▀▀   ▀▀▀▀▀▀
 ▀▀▀▀▀▀▀▀▀▀▀  ▀▀▀▀▀▀▀▀▀▀▀▀      ▀▀▀▀▀▀     ▀    ▀▀▀▀▀▀
 ''')
-sprint_welcome('''Microsoft (R) MS-DOS (R) Version 3.11
+sprint_welcome('''IBM (R) PC-DOS (R) Version 3.11
 (C) Copyright Quantum Corp 1981-1985''')
 sprint_name("CURRENT USER: " + uname)
 
