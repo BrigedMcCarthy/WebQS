@@ -8,8 +8,21 @@ import time
 import random
 import math
 import sys
-import playsound
-from playsound import playsound
+
+# Try to import playsound, but handle failures gracefully for headless environments
+try:
+    from playsound import playsound as _playsound
+    AUDIO_ENABLED = True
+    def playsound(sound):
+        try:
+            _playsound(sound)
+        except Exception:
+            # Silently ignore audio playback errors (headless environment, missing files, etc)
+            pass
+except (ImportError, ModuleNotFoundError):
+    AUDIO_ENABLED = False
+    def playsound(sound):
+        pass
 
 WHITE_CYAN = "\x1b[1;34;44m" # I know its not white cyan! im to lazy to change it 
 # (few weeks later) still not changing it.
@@ -80,18 +93,18 @@ sprint_name("CURRENT USER: " + uname)
 
 dmr_key = input("Turn the key to enable the DMR? ")
 # DMR startup
-if dmr_key == "yes" or "y" or "Yes":
+if dmr_key.lower() in ["yes", "y"]:
     print("Reactor core ignition sequence primed, please vacate the core chamber immediately!")
-    playsound('Audio\key is online.wav')
+    playsound('Audio/key is online.wav')
     time.sleep(3)
     print("Gravitational lasers ONLINE, raising core superstructure to center position")
-    playsound('Audio\gravity laser.wav')
+    playsound('Audio/gravity laser.wav')
     time.sleep(2)
     print("Dark Matter reactor superstructure has been raised to center position")
-    playsound('Audio\center position.wav')
+    playsound('Audio/center position.wav')
     time.sleep(3)
     print("Activating power lasers...")
-    playsound('Audio\startupopen.wav')
+    playsound('Audio/startupopen.wav')
     print("Power lasers ONLINE.")
     time.sleep(2)
     print("Dark Matter reactor ONLINE, converting power back to main facility grid")
@@ -106,10 +119,10 @@ time.sleep(2)
 print("*BELL*")
 time.sleep(2)
 print("later that night...")
-playsound('Audio\Dark-Matter-Core-Temp-safe-limits.mp3')
+playsound('Audio/Dark-Matter-Core-Temp-safe-limits.mp3')
 time.sleep(3)
 print("ATTENTION: DARK MATTER REACTOR INTEGRITY DROPPING! ENGAGE THERMAL SYSTEMS!")
-playsound('Audio\Integrity-dropping.mp3')
+playsound('Audio/Integrity-dropping.mp3')
 usr = int(input("Do you: 1,Engage coolant to slow the loss of integrity. or 2, disregard the alert and continue operations: "))
 
 if usr == 1:
@@ -130,7 +143,7 @@ for i in range(4):
     integ -= 25
 time.sleep(3)
 print("Dark matter reactor integrity monitering systems failure, attempting to reboot!")
-playsound('Audio\Integrity-Monitoring-Failure.mp3')
+playsound('Audio/Integrity-Monitoring-Failure.mp3')
 time.sleep(1)
 print("Reboot: Failure! integrity status UNKNOWN!")
 time.sleep(2)
@@ -150,11 +163,13 @@ time.sleep(2)
 thermal_choice = int(input("Where do you want to look for the shutdown code? Option 1: Break room Option 2: Attempt to recover deleted shutdown code from mainframe Option 3: Dont look for code "))
 
 #thermal shutdown code options 
+shutdown_code = "0"
 
 if thermal_choice == 1:
     print("You go into the break room and see a sticky note on the fridge")
     print("Todays security code is 5-33-41-18")
-if thermal_choice == 2:
+    shutdown_code = "5-33-41-18"
+elif thermal_choice == 2:
   print("You log into the mainframe and attempt to recover the shutdown code")
   print("=============")
   fail_chance = random.randint(1, 100) #fail_chance number choosen by @katsumi143 on discord
@@ -169,9 +184,15 @@ if thermal_choice == 2:
   print("=============")
 
 #Horrible way to check if the user inputed code is correct. ABSOLUTLY HORRIBLE. Keeping it though
-code_input = int(input("Type the shutdown code: "))
-result = int(shutdown_code)
-code_check = result - code_input
+code_input_str = input("Type the shutdown code: ")
+if "-" in shutdown_code:
+    code_check = 1 if code_input_str != shutdown_code.replace("-", "") else 0
+else:
+    try:
+        result = int(shutdown_code)
+        code_check = result - int(code_input_str)
+    except (ValueError, AttributeError):
+        code_check = 1
 #DONT REDO
 #CODE WORKS FINE
 #JUST VERY INEFFICIENT WAY OF DOING IT
@@ -180,6 +201,6 @@ code_check = result - code_input
 #shutdown sequence
 if code_check == 0:
   print("Shutdown code accepted!\nAttempting reactor shutdown...")
-  playsound('Audio\eme_shutdown.mp3')
+  playsound('Audio/eme_shutdown.mp3')
 elif code_check != 0:
   print("Shutdown code DENIED!\nCritical error: CODE NOT IN SYSTEM")
