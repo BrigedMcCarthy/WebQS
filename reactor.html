@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>RBMK Reactor</title>
+<style>
+body { font-family: Arial, sans-serif; margin: 20px; }
+.readout { background: #000; color: #0f0; padding: 20px; font-family: monospace; border: 2px solid #0f0; margin: 20px 0; min-height: 400px; white-space: pre; }
+button { margin: 5px; padding: 8px 12px; }
+.section { margin: 20px 0; }
+</style>
+</head>
+<body>
+
+<h1>RBMK Reactor Control</h1>
+
+<div style="background: #ffcccc; padding: 10px; margin: 10px 0; border: 1px solid red; max-height: 150px; overflow-y: auto;">
+<strong>ERROR LOG:</strong>
+<div id="errorlog" style="font-family: monospace; font-size: 11px; color: #333;"></div>
+</div>
+
+<div class="readout" id="readout">Loading...</div>
+
+<div class="section">
+<button onclick="reactor_start()">START</button>
+<button onclick="reactor_stop()">STOP</button>
+<button onclick="reactor_reset()">RESET</button>
+<button onclick="reactor_scram()">SCRAM</button>
+</div>
+
+<div class="section">
+<h3>Rods (Pull = less power)</h3>
+<button onclick="rod_all_out()">All Out</button>
+<button onclick="rod_all_mid()">All Mid</button>
+<button onclick="rod_all_in()">All In</button>
+<br>
+<button onclick="rod_up(0)">Rod1 UP</button>
+<button onclick="rod_up(1)">Rod2 UP</button>
+<button onclick="rod_up(2)">Rod3 UP</button>
+<button onclick="rod_up(3)">Rod4 UP</button>
+<button onclick="rod_up(4)">Rod5 UP</button>
+<button onclick="rod_up(5)">Rod6 UP</button>
+<button onclick="rod_up(6)">Rod7 UP</button>
+<button onclick="rod_up(7)">Rod8 UP</button>
+<br>
+<button onclick="rod_down(0)">Rod1 DN</button>
+<button onclick="rod_down(1)">Rod2 DN</button>
+<button onclick="rod_down(2)">Rod3 DN</button>
+<button onclick="rod_down(3)">Rod4 DN</button>
+<button onclick="rod_down(4)">Rod5 DN</button>
+<button onclick="rod_down(5)">Rod6 DN</button>
+<button onclick="rod_down(6)">Rod7 DN</button>
+<button onclick="rod_down(7)">Rod8 DN</button>
+</div>
+
+<div class="section">
+<h3>Cooling Pumps</h3>
+<button onclick="pump_toggle(0)">Pump 1</button>
+<button onclick="pump_toggle(1)">Pump 2</button>
+<button onclick="pump_toggle(2)">Pump 3</button>
+<button onclick="pump_toggle(3)">Pump 4</button>
+</div>
+
+<div class="section">
+<h3>Systems</h3>
+<button onclick="relief_toggle()">Relief Valve</button>
+<button onclick="letdown_toggle()">Letdown</button>
+<button onclick="safety_toggle()">Safety</button>
+</div>
+
+<script>
+// Error logging
+var error_log = [];
+window.onerror = function(msg, url, lineNo, columnNo, error) {
+    var err_msg = "ERROR: " + msg + " (Line " + lineNo + ")";
+    error_log.push(err_msg);
+    update_error_display();
+    return false;
+};
+
+var orig_log = console.log;
+var orig_error = console.error;
+console.log = function(msg) {
+    error_log.push("LOG: " + msg);
+    update_error_display();
+    orig_log(msg);
+};
+console.error = function(msg) {
+    error_log.push("ERROR: " + msg);
+    update_error_display();
+    orig_error(msg);
+};
+
+function update_error_display() {
+    var div = document.getElementById("errorlog");
+    if (div) {
+        var text = error_log.slice(-10).join("\n");
+        div.textContent = text;
+    }
+}
+
+var reactor_power = 0;
+var reactor_temp = 270;
+var reactor_pressure = 70;
+var reactor_running = false;
+var reactor_scram_flag = false;
+var reactor_time = 0;
+var frame_count = 0;
+
+var rod_positions = [50, 50, 50, 50, 50, 50, 50, 50];
+var pump_on = [false, false, false, false];
+var relief_on = false;
+var letdown_on = true;
+var safety_on = true;
+
+var last_update = Date.now();
+
+function update_physics() {
+    var now = Date.now();
+    var dt = (now - last_update) / 1000;
+    last_update = now;
+    
+    if (dt > 0.2) dt = 0.2;
+    if (!reactor_running) return;
+    
+    // Rod effect on reactivity
+    var rod_avg = (rod_positions[0] + rod_positions[1] + rod_positions[2] + rod_positions[3] + rod_positions[4] + rod_positions[5] + rod_positions[6] + rod_positions[7]) / 8;
+    var rod_factor = (100 - rod_avg) / 100;
+    var power_growth = rod_factor * 0.2 * dt;
+    
+    reactor_power = reactor_power * (1 + power_growth);
+    if (reactor_power < 0) reactor_power = 0;
+    if (reactor_power > 1200) reactor_power = 1200;
+    
+    // Temperature
+    var temp_from_power = (reactor_power / 1000) * 60 * dt;
+    var cooling = 0;
+    for (var i = 0; i < 4; i++) {
+        if (pump_on[i]) cooling += 40 * dt;
+    }
+    
+    reactor_temp = reactor_temp + temp_from_power - cooling;
+    if (reactor_temp < 270) reactor_temp = 270;
+    if (reactor_temp > 350) reactor_temp = 350;
+    
+    // Pressure
+    if (reactor_temp > 280) {
+        reactor_pressure += (reactor_temp - 280) * 0.25 * dt;
+    }
+    if (relief_on) {
+        reactor_pressure -= 20 * dt;
+    }
+    if (reactor_pressure < 50) reactor_pressure = 50;
+    if (reactor_pressure > 100) reactor_pressure = 100;
+    
+    // Auto scram
+    if (safety_on && (reactor_temp > 320 || reactor_pressure > 95)) {
+        reactor_scram_flag = true;
+        for (var i = 0; i < 8; i++) {
+            rod_positions[i] = 100;
+        }
+        reactor_power *= 0.7;
+    }
+    
+    reactor_time += dt;
+    
+    if (reactor_power < 1) reactor_running = false;
+}
+
+function redraw() {
+    frame_count++;
+    update_physics();
+    
+    var p_bar = "";
+    var p_filled = Math.floor(reactor_power / 60);
+    for (var i = 0; i < p_filled; i++) p_bar += "█";
+    for (var i = p_filled; i < 20; i++) p_bar += "░";
+    
+    var t_bar = "";
+    var t_pct = (reactor_temp - 270) / 80;
+    var t_filled = Math.floor(t_pct * 20);
+    for (var i = 0; i < t_filled; i++) t_bar += "█";
+    for (var i = t_filled; i < 20; i++) t_bar += "░";
+    
+    var pr_bar = "";
+    var pr_pct = (reactor_pressure - 50) / 50;
+    var pr_filled = Math.floor(pr_pct * 20);
+    for (var i = 0; i < pr_filled; i++) pr_bar += "█";
+    for (var i = pr_filled; i < 20; i++) pr_bar += "░";
+    
+    var rod_vis = "";
+    for (var i = 0; i < 8; i++) {
+        var r = rod_positions[i];
+        if (r < 25) rod_vis += "░";
+        else if (r < 50) rod_vis += "▒";
+        else if (r < 75) rod_vis += "▓";
+        else rod_vis += "█";
+    }
+    
+    var pumps_on = 0;
+    for (var i = 0; i < 4; i++) {
+        if (pump_on[i]) pumps_on++;
+    }
+    
+    var alarm = "OK";
+    if (reactor_scram_flag) alarm = "SCRAM ACTIVE";
+    else if (reactor_temp > 310) alarm = "HIGH TEMP";
+    else if (reactor_pressure > 85) alarm = "HIGH PRESSURE";
+    
+    var output = "RBMK-1000 REACTOR CONTROL SYSTEM\n";
+    output += "================================\n\n";
+    output += "FRAME: " + frame_count + "\n";
+    output += "STATUS: " + (reactor_running ? "RUNNING" : "OFFLINE") + "\n";
+    output += "TIME: " + reactor_time.toFixed(1) + "s\n";
+    output += "SCRAM: " + (reactor_scram_flag ? "YES" : "NO") + "\n";
+    output += "\n";
+    output += "POWER OUTPUT:\n";
+    output += p_bar + "  " + reactor_power.toFixed(0) + " MW\n\n";
+    output += "CORE TEMP:\n";
+    output += t_bar + "  " + reactor_temp.toFixed(0) + "°C\n\n";
+    output += "PRESSURE:\n";
+    output += pr_bar + "  " + reactor_pressure.toFixed(0) + " Bar\n\n";
+    output += "CONTROL RODS:\n";
+    output += "[" + rod_vis + "]\n\n";
+    output += "ROD POSITIONS (0=out, 100=in):\n";
+    for (var i = 0; i < 8; i++) {
+        output += "Rod " + (i+1) + ": " + rod_positions[i].toFixed(0) + "%\n";
+    }
+    output += "\n";
+    output += "COOLING: " + pumps_on + "/4 pumps on\n";
+    output += "RELIEF: " + (relief_on ? "OPEN" : "CLOSED") + "\n";
+    output += "LETDOWN: " + (letdown_on ? "OPEN" : "CLOSED") + "\n";
+    output += "SAFETY: " + (safety_on ? "ON" : "OFF") + "\n";
+    output += "\nALARM: " + alarm + "\n";
+    
+    document.getElementById("readout").textContent = output;
+}
+
+function reactor_start() {
+    if (!reactor_running) {
+        reactor_running = true;
+        reactor_scram_flag = false;
+        reactor_power = 50;
+        last_update = Date.now();
+        redraw();
+    }
+}
+
+function reactor_stop() {
+    reactor_running = false;
+    reactor_power = 0;
+    redraw();
+}
+
+function reactor_reset() {
+    reactor_power = 0;
+    reactor_temp = 270;
+    reactor_pressure = 70;
+    reactor_running = false;
+    reactor_scram_flag = false;
+    reactor_time = 0;
+    rod_positions = [50, 50, 50, 50, 50, 50, 50, 50];
+    pump_on = [false, false, false, false];
+    relief_on = false;
+    letdown_on = true;
+    safety_on = true;
+    last_update = Date.now();
+    redraw();
+}
+
+function reactor_scram() {
+    reactor_scram_flag = true;
+    for (var i = 0; i < 8; i++) {
+        rod_positions[i] = 100;
+    }
+    redraw();
+}
+
+function rod_up(n) {
+    rod_positions[n] = Math.max(0, rod_positions[n] - 10);
+    redraw();
+}
+
+function rod_down(n) {
+    rod_positions[n] = Math.min(100, rod_positions[n] + 10);
+    redraw();
+}
+
+function rod_all_out() {
+    for (var i = 0; i < 8; i++) rod_positions[i] = 0;
+    redraw();
+}
+
+function rod_all_mid() {
+    for (var i = 0; i < 8; i++) rod_positions[i] = 50;
+    redraw();
+}
+
+function rod_all_in() {
+    for (var i = 0; i < 8; i++) rod_positions[i] = 100;
+    redraw();
+}
+
+function pump_toggle(n) {
+    pump_on[n] = !pump_on[n];
+    redraw();
+}
+
+function relief_toggle() {
+    relief_on = !relief_on;
+    redraw();
+}
+
+function letdown_toggle() {
+    letdown_on = !letdown_on;
+    redraw();
+}
+
+function safety_toggle() {
+    safety_on = !safety_on;
+    redraw();
+}
+
+setInterval(redraw, 100);
+console.log("REACTOR SYSTEM INITIALIZED");
+console.log("Game loop started - refreshing every 100ms");
+redraw();
+</script>
+
+</body>
+</html>

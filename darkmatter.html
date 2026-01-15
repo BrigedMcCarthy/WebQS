@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>DMR - Dark Matter Reactor Control</title>
+<style>
+body { font-family: monospace; margin: 0; padding: 10px; background: #0a0a0a; color: #ff6600; }
+.container { max-width: 1400px; margin: 0 auto; }
+.header { background: #330000; padding: 15px; margin-bottom: 10px; border: 3px solid #ff6600; text-align: center; }
+.header h1 { margin: 0; color: #ff9933; }
+.display { background: #1a0a00; padding: 15px; margin: 10px 0; border: 2px solid #ff6600; white-space: pre; font-size: 12px; min-height: 600px; }
+.controls { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 10px 0; }
+.control-group { background: #2d1500; padding: 12px; border: 2px solid #ff6600; }
+.control-group h3 { margin: 0 0 10px 0; color: #ff9933; border-bottom: 1px solid #ff6600; padding-bottom: 5px; }
+button { background: #330000; color: #ff6600; border: 2px solid #ff6600; padding: 8px; margin: 4px 2px; cursor: pointer; font-family: monospace; font-weight: bold; }
+button:hover { background: #ff6600; color: #000; }
+button:active { background: #ffaa33; }
+.error-box { background: #330000; color: #ff3333; padding: 12px; margin: 10px 0; border: 3px solid #ff3333; max-height: 120px; overflow-y: auto; font-size: 11px; }
+.critical { background: #660000; color: #ff0000; padding: 10px; margin: 10px 0; border: 3px solid #ff0000; }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<div class="header">
+<h1>⚛ DMR - DARK MATTER REACTOR CONTROL SYSTEM ⚛</h1>
+<p>Madison Research Institute | Quantum Science Energy Research Facility</p>
+<p>CLASSIFIED - LEVEL 9 | Director: Dr. Helene Kaiser</p>
+</div>
+
+<div class="error-box" id="errorlog">
+System initializing...
+</div>
+
+<div id="critical_alert" style="display:none;" class="critical">
+⚠️ CRITICAL CONDITIONS DETECTED - TEMPERATURE OR PRESSURE EXCEEDED LIMITS ⚠️
+</div>
+
+<div class="display" id="display">
+Loading DMR control systems...
+</div>
+
+<div class="controls">
+
+<div class="control-group">
+<h3>🔴 REACTOR CONTROL</h3>
+<button onclick="prime_ignition()">PRIME IGNITION</button>
+<button onclick="raise_to_center()">RAISE TO CENTER</button>
+<button onclick="dmr_startup()">STARTUP SEQUENCE</button>
+<button onclick="dmr_shutdown()">SHUTDOWN</button>
+<button onclick="dmr_scram()">EMERGENCY STALL</button>
+<button onclick="dmr_reset()">RESET SYSTEMS</button>
+<button onclick="check_critical()">Check Status</button>
+</div>
+
+<div class="control-group">
+<h3>🔋 POWER LASER</h3>
+<button onclick="laser_level(0)">Level 0</button>
+<button onclick="laser_level(1)">Level 1</button>
+<button onclick="laser_level(2)">Level 2</button>
+<button onclick="laser_level(3)">Level 3</button>
+<button onclick="laser_level(4)">Level 4</button>
+<button onclick="laser_level(5)">Level 5</button>
+</div>
+
+<div class="control-group">
+<h3>❄️ COOLANT SYSTEM</h3>
+<button onclick="adjust_coolant(50)">Speed 50%</button>
+<button onclick="adjust_coolant(75)">Speed 75%</button>
+<button onclick="adjust_coolant(100)">Speed 100%</button>
+<button onclick="adjust_coolant(125)">Speed 125%</button>
+<button onclick="adjust_coolant(150)">Speed 150%</button>
+</div>
+
+<div class="control-group">
+<h3>⚙️ FUEL SYSTEM</h3>
+<button onclick="check_fuel_cells()">Check Fuel Cells</button>
+<button onclick="eject_fuel(1)">Eject Cell 1</button>
+<button onclick="eject_fuel(2)">Eject Cell 2</button>
+<button onclick="eject_fuel(3)">Eject Cell 3</button>
+</div>
+
+<div class="control-group">
+<h3>🛡️ CONTAINMENT</h3>
+<button onclick="toggle_containment()">Toggle Field</button>
+<button onclick="boost_shields()">Boost Shields</button>
+<button onclick="check_seals()">Check Seals</button>
+<button onclick="reinforce_seals()">Reinforce Seals</button>
+</div>
+
+<div class="control-group">
+<h3>☢️ SUPPORT REACTORS</h3>
+<button onclick="check_support()">Check All</button>
+<button onclick="boost_support()">Boost All</button>
+<button onclick="shutdown_support()">Shutdown</button>
+<button onclick="test_fission(1)">Test Fission</button>
+</div>
+
+<div class="control-group">
+<h3>🔥 THERMAL SYSTEM</h3>
+<button onclick="adjust_efficiency(75)">Efficiency 75%</button>
+<button onclick="adjust_efficiency(100)">Efficiency 100%</button>
+<button onclick="maximize_efficiency()">Maximize</button>
+<button onclick="check_combustion()">Check Combustion</button>
+</div>
+
+<div class="control-group">
+<h3>📊 DIAGNOSTICS</h3>
+<button onclick="full_diagnostics()">Full Diagnostic</button>
+<button onclick="clear_alarms()">Clear Alarms</button>
+<button onclick="radiation_scan()">Radiation Scan</button>
+<button onclick="structural_check()">Structural Check</button>
+</div>
+
+</div>
+
+</div>
+
+<script>
+var error_messages = [];
+
+function log_error(msg) {
+    error_messages.push(msg);
+    if (error_messages.length > 20) error_messages.shift();
+    var div = document.getElementById("errorlog");
+    if (div) div.textContent = error_messages.join("\n");
+}
+
+function play_sound(filename) {
+    try {
+        var audio = new Audio("/Audio/" + filename);
+        audio.volume = 0.6;
+        audio.play().catch(function(e) {});
+    } catch(e) {}
+}
+
+// ===== DMR STATE =====
+var dmr = {
+    power_output: 0,
+    target_power: 30,
+    temperature: 3800,
+    pressure: 98,
+    
+    fuel_cell_1: 100,
+    fuel_cell_2: 100,
+    fuel_cell_3: 95,
+    
+    coolant_pump_speed: 100,
+    thermal_efficiency: 100,
+    power_laser_level: 0,
+    combustion_chamber_temp: 1800,
+    
+    fission_reactors: [100, 100, 100, 100, 100, 100],
+    
+    emergency_stall_ready: true,
+    containment_field: 100,
+    radiation_shield: 100,
+    pressure_seals: [100, 100, 100],
+    
+    operational: false,
+    critical_warning: false,
+    shutdown_code: "0",
+    
+    running_time: 0,
+    frame: 0
+};
+
+var last_time = Date.now();
+
+function update_physics() {
+    var now = Date.now();
+    var dt = (now - last_time) / 1000;
+    last_time = now;
+    
+    if (dt > 0.2) dt = 0.2;
+    if (!dmr.operational) return;
+    
+    // Power laser affects combustion
+    dmr.combustion_chamber_temp = 1800 + (dmr.power_laser_level * 400);
+    
+    // Coolant affects temperature
+    if (dmr.coolant_pump_speed < 50) {
+        dmr.temperature += 50 * dt;
+    } else if (dmr.coolant_pump_speed > 100) {
+        dmr.temperature -= 20 * dt;
+    } else {
+        dmr.temperature = 3800 + (dmr.power_output - 30) * 20;
+    }
+    
+    // Fuel cell degradation (especially cell 3)
+    dmr.fuel_cell_3 -= (0.1 + 0.2 * Math.random()) * dt;
+    if (dmr.fuel_cell_3 < 0) dmr.fuel_cell_3 = 0;
+    
+    // Pressure affected by power
+    dmr.pressure = 98 + (dmr.power_output / 30) * 10;
+    
+    // Power output depends on fuel and coolant
+    var avg_fuel = (dmr.fuel_cell_1 + dmr.fuel_cell_2 + dmr.fuel_cell_3) / 3;
+    dmr.power_output = (avg_fuel / 100) * dmr.target_power * (dmr.coolant_pump_speed / 100);
+    
+    // Containment field degrades under stress
+    if (dmr.temperature > 4500) {
+        dmr.containment_field -= 0.5 * dt;
+    } else if (dmr.pressure > 110) {
+        dmr.containment_field -= 0.3 * dt;
+    }
+    if (dmr.containment_field < 0) dmr.containment_field = 0;
+    
+    // Radiation shield
+    if (dmr.power_output > 25) {
+        dmr.radiation_shield -= 0.2 * dt;
+    }
+    if (dmr.radiation_shield < 0) dmr.radiation_shield = 0;
+    
+    // Pressure seals degrade
+    for (var i = 0; i < 3; i++) {
+        if (dmr.pressure > 110) {
+            dmr.pressure_seals[i] -= 0.1 * dt;
+        } else if (dmr.pressure < 95) {
+            dmr.pressure_seals[i] += 0.05 * dt;
+        }
+        if (dmr.pressure_seals[i] < 0) dmr.pressure_seals[i] = 0;
+        if (dmr.pressure_seals[i] > 100) dmr.pressure_seals[i] = 100;
+    }
+    
+    // Support reactors
+    for (var i = 0; i < 6; i++) {
+        if (dmr.power_output > dmr.target_power) {
+            dmr.fission_reactors[i] -= 0.3 * dt;
+        } else {
+            dmr.fission_reactors[i] += 0.1 * dt;
+        }
+        if (dmr.fission_reactors[i] < 0) dmr.fission_reactors[i] = 0;
+        if (dmr.fission_reactors[i] > 100) dmr.fission_reactors[i] = 100;
+    }
+    
+    // Integrity system - drops during operation
+    if (dmr.operational) {
+        dmr.integrity -= (dmr.power_output / dmr.target_power) * 0.5 * dt;
+    }
+    if (dmr.integrity < 0) dmr.integrity = 0;
+    if (dmr.integrity > 100) dmr.integrity = 100;
+    
+    // Integrity warnings
+    if (dmr.integrity < 75 && !dmr.integrity_warning_75) {
+        dmr.integrity_warning_75 = true;
+        play_sound("integrity-dropping.mp3");
+    }
+    if (dmr.integrity < 75 && dmr.integrity < 50 && !dmr.integrity_warning_50) {
+        dmr.integrity_warning_50 = true;
+        play_sound("75.mp3");
+    }
+    if (dmr.integrity < 50 && dmr.integrity < 25 && !dmr.integrity_warning_25) {
+        dmr.integrity_warning_25 = true;
+        play_sound("50.mp3");
+    }
+    if (dmr.integrity < 25 && !dmr.integrity_critical) {
+        dmr.integrity_critical = true;
+        play_sound("25.mp3");
+    }
+    if (dmr.integrity < 10 && dmr.integrity_critical) {
+        play_sound("integity-monitoring-failure.mp3");
+        dmr.integrity_critical = false;
+    }
+    
+    // Critical check
+    if (dmr.temperature > 5000 || dmr.pressure > 120) {
+        if (!dmr.critical_warning) {
+            play_sound("Dark-Matter-Core-Temp-safe-limits.mp3");
+            if (Math.random() > 0.5) {
+                play_sound("reactoropspersonnel.wav");
+            }
+        }
+        dmr.critical_warning = true;
+        if (dmr.emergency_stall_ready) {
+            dmr_scram();
+        }
+    } else {
+        dmr.critical_warning = false;
+    }
+    
+    // Pressure purge failure check
+    if (dmr.pressure > 115 && !dmr.pressure_purge_warning) {
+        play_sound("Pressure-Purge-Failure.wav");
+        dmr.pressure_purge_warning = true;
+        log_error("[WARNING] Pressure purge system failure detected!");
+    }
+    
+    // Code Red - approaching thermal runaway
+    if (dmr.temperature > 4500 && !dmr.code_red) {
+        dmr.code_red = true;
+        play_sound("code_red.wav");
+        log_error("[CODE RED] THERMAL RUNAWAY IN PROGRESS!");
+    }
+    
+    // Shutdown window check (can only shutdown before 60 seconds or after code black)
+    if (dmr.operational && dmr.running_time > 60) {
+        dmr.shutdown_window_passed = true;
+    }
+    
+    // Code Black - temps above 3000K and shutdown window passed
+    if (dmr.temperature > 3000 && dmr.shutdown_window_passed && !dmr.code_black) {
+        dmr.code_black = true;
+        log_error("[CODE BLACK] SHUTDOWN WINDOW CLOSED - REACTOR LOCKED AT OPERATING TEMP");
+        log_error("[CODE BLACK] EMERGENCY PROTOCOL: Eject all fuel cells within 1-3 seconds of each other");
+    }
+    
+    // Check for successful emergency combustion stall (all 3 fuel cells ejected within window)
+    if (dmr.code_black && dmr.fuel_cell_1 === 0 && dmr.fuel_cell_2 === 0 && dmr.fuel_cell_3 === 0) {
+        var times = dmr.fuel_ejection_times.filter(t => t !== null);
+        if (times.length === 3) {
+            var timeDiff = Math.max(...times) - Math.min(...times);
+            if (timeDiff >= 1 && timeDiff <= 3) {
+                dmr.operational = false;
+                dmr.code_black = false;
+                dmr.power_output = 0;
+                play_sound("reactor_shutdown_lowering.wav");
+                log_error("[SUCCESS] Emergency combustion stall initiated!");
+                log_error("[SUCCESS] Reactor entering maintenance holding position...");
+                dmr.fuel_ejection_times = [null, null, null];
+            }
+        }
+    }
+    
+    dmr.running_time += dt;
+}
+
+function redraw() {
+    dmr.frame++;
+    update_physics();
+    
+    var output = "";
+    output += "╔════════════════════════════════════════════════════════════════════════╗\n";
+    output += "║    DARK MATTER REACTOR - OPERATIONAL DASHBOARD                        ║\n";
+    output += "║    Madison Research Institute - Quantum Science Energy Research        ║\n";
+    output += "╚════════════════════════════════════════════════════════════════════════╝\n\n";
+    
+    output += "STATUS: " + (dmr.operational ? "OPERATIONAL" : "OFFLINE") + "  |  TIME: " + dmr.running_time.toFixed(1) + "s  |  FRAME: " + dmr.frame + "\n";
+    output += "CRITICAL: " + (dmr.critical_warning ? "YES ⚠️" : "NO") + "  |  EMERGENCY STALL: " + (dmr.emergency_stall_ready ? "READY" : "ENGAGED") + "\n";
+    if (dmr.code_red) output += "⚠️ CODE RED - THERMAL RUNAWAY\n";
+    if (dmr.code_black) output += "🔴 CODE BLACK - SHUTDOWN LOCKED - EJECT FUEL CELLS WITHIN 1-3 SECONDS\n";
+    output += "\n";
+    
+    output += "┌─ CORE SYSTEMS ─────────────────────────────────────────────────────────┐\n";
+    output += "│ TEMPERATURE:        " + dmr.temperature.toFixed(0) + " K  |  TARGET: 3800 K  |  COMBUSTION: " + dmr.combustion_chamber_temp.toFixed(0) + " K\n";
+    output += "│ PRESSURE:           " + dmr.pressure.toFixed(1) + "%   |  LIMITS: 80-110%\n";
+    output += "│ POWER OUTPUT:       " + dmr.power_output.toFixed(2) + " GW  |  TARGET: " + dmr.target_power.toFixed(1) + " GW\n";
+    output += "│ POWER LASER LEVEL:  " + dmr.power_laser_level + "/5" + (dmr.power_lasers_active ? " (ACTIVE)" : " (OFFLINE)") + "\n";
+    output += "│ COOLANT PUMP:       " + dmr.coolant_pump_speed.toFixed(0) + "%  |  THERMAL EFF: " + dmr.thermal_efficiency.toFixed(0) + "%\n";
+    output += "│ REACTOR INTEGRITY:  " + (dmr.integrity < 10 ? "ERROR" : dmr.integrity.toFixed(1)) + "%\n";
+    output += "└────────────────────────────────────────────────────────────────────────┘\n\n";
+    
+    output += "┌─ FUEL CELLS ───────────────────────────────────────────────────────────┐\n";
+    output += "│ Cell 1: " + dmr.fuel_cell_1.toFixed(1) + "%  |  Cell 2: " + dmr.fuel_cell_2.toFixed(1) + "%  |  Cell 3: " + dmr.fuel_cell_3.toFixed(1) + "%  ⚠️ DEFECTIVE\n";
+    output += "│ Average Fuel: " + ((dmr.fuel_cell_1 + dmr.fuel_cell_2 + dmr.fuel_cell_3) / 3).toFixed(1) + "%\n";
+    output += "└────────────────────────────────────────────────────────────────────────┘\n\n";
+    
+    output += "┌─ SAFETY SYSTEMS ───────────────────────────────────────────────────────┐\n";
+    output += "│ CONTAINMENT FIELD:  " + dmr.containment_field.toFixed(1) + "%\n";
+    output += "│ RADIATION SHIELD:   " + dmr.radiation_shield.toFixed(1) + "%\n";
+    output += "│ PRESSURE SEAL A:    " + dmr.pressure_seals[0].toFixed(1) + "%  |  SEAL B: " + dmr.pressure_seals[1].toFixed(1) + "%  |  SEAL C: " + dmr.pressure_seals[2].toFixed(1) + "%\n";
+    output += "└────────────────────────────────────────────────────────────────────────┘\n\n";
+    
+    output += "┌─ SUPPORT REACTORS (Fission) ───────────────────────────────────────────┐\n";
+    output += "│ Reactor 1: " + dmr.fission_reactors[0].toFixed(0) + "%  |  Reactor 2: " + dmr.fission_reactors[1].toFixed(0) + "%  |  Reactor 3: " + dmr.fission_reactors[2].toFixed(0) + "%\n";
+    output += "│ Reactor 4: " + dmr.fission_reactors[3].toFixed(0) + "%  |  Reactor 5: " + dmr.fission_reactors[4].toFixed(0) + "%  |  Reactor 6: " + dmr.fission_reactors[5].toFixed(0) + "%\n";
+    output += "└────────────────────────────────────────────────────────────────────────┘\n\n";
+    
+    var warnings = [];
+    if (dmr.temperature > 4500) warnings.push("CRITICAL TEMP");
+    if (dmr.pressure > 105) warnings.push("HIGH PRESSURE");
+    if (dmr.fuel_cell_3 < 20) warnings.push("FUEL CELL 3 CRITICAL");
+    if (dmr.containment_field < 50) warnings.push("CONTAINMENT WEAK");
+    if (dmr.radiation_shield < 30) warnings.push("RADIATION DANGER");
+    
+    output += "ALARMS: " + (warnings.length > 0 ? warnings.join(" | ") : "NONE") + "\n";
+    
+    document.getElementById("display").textContent = output;
+    
+    var critical_div = document.getElementById("critical_alert");
+    if (dmr.critical_warning) {
+        critical_div.style.display = "block";
+    } else {
+        critical_div.style.display = "none";
+    }
+}
+
+function prime_ignition() {
+    if (!dmr.ignition_primed) {
+        dmr.ignition_primed = true;
+        play_sound("center position.wav");
+        log_error("[IGNITION] Priming ignition systems...");
+        log_error("[IGNITION] Raise reactor to CENTER position before engaging power lasers");
+    } else {
+        log_error("[IGNITION] Already primed - proceed with startup sequence");
+    }
+}
+
+function raise_to_center() {
+    if (dmr.ignition_primed && !dmr.raised_to_center) {
+        dmr.raised_to_center = true;
+        log_error("[RAISE] Reactor raised to center position - ready for power laser engagement");
+    } else if (!dmr.ignition_primed) {
+        log_error("[ERROR] Ignition must be primed first!");
+    } else {
+        log_error("[RAISE] Already at center position");
+    }
+}
+
+function dmr_startup() {
+    if (!dmr.operational && dmr.ignition_primed && dmr.raised_to_center) {
+        dmr.operational = true;
+        dmr.power_lasers_active = true;
+        dmr.emergency_stall_ready = true;
+        dmr.running_time = 0;
+        play_sound("startupopen.wav");
+        play_sound("dmr.wav");
+        log_error("[STARTUP] Power lasers engaged!");
+        log_error("[STARTUP] Gravitational laser system online");
+        log_error("[STARTUP] Dark Matter Reactor initialization sequence complete");
+    } else if (!dmr.ignition_primed) {
+        log_error("[ERROR] Ignition not primed!");
+    } else if (!dmr.raised_to_center) {
+        log_error("[ERROR] Reactor not raised to center position!");
+    } else {
+        log_error("[ERROR] Reactor already operational");
+    }
+}
+
+function dmr_shutdown() {
+    if (dmr.temperature > 3000) {
+        play_sound("Failure (1).wav");
+        log_error("[SHUTDOWN FAILED] Temperature too high for safe shutdown!");
+        log_error("[SHUTDOWN FAILED] Reactor remains operational");
+        play_sound("reacopps.mp3");
+        return;
+    }
+    dmr.operational = false;
+    dmr.power_output = 0;
+    dmr.power_lasers_active = false;
+    play_sound("reactor_shutdown_lowering.wav");
+    log_error("[SHUTDOWN] Dark Matter Reactor powering down...");
+    log_error("[SHUTDOWN] Reactor lowering into holding chamber for maintenance");
+}
+
+function dmr_scram() {
+    dmr.operational = false;
+    dmr.emergency_stall_ready = false;
+    dmr.power_output = 0;
+    dmr.power_laser_level = 0;
+    play_sound("Emergency-Shutdown-Activated.wav");
+    play_sound("Power-plant-Evacuate-Alarm.mp3");
+    log_error("[EMERGENCY] COMBUSTION STALL PROTOCOL ENGAGED!");
+    log_error("[ALERT] FACILITY EVACUATION IN PROGRESS!");
+}
+
+function dmr_reset() {
+    dmr = {
+        power_output: 0,
+        target_power: 30,
+        temperature: 3800,
+        pressure: 98,
+        fuel_cell_1: 100,
+        fuel_cell_2: 100,
+        fuel_cell_3: 95,
+        coolant_pump_speed: 100,
+        thermal_efficiency: 100,
+        power_laser_level: 0,
+        combustion_chamber_temp: 1800,
+        fission_reactors: [100, 100, 100, 100, 100, 100],
+        emergency_stall_ready: true,
+        containment_field: 100,
+        radiation_shield: 100,
+        pressure_seals: [100, 100, 100],
+        operational: false,
+        critical_warning: false,
+        pressure_purge_warning: false,
+        code_red: false,
+        code_black: false,
+        shutdown_window_passed: false,
+        fuel_ejection_times: [null, null, null],
+        ignition_primed: false,
+        raised_to_center: false,
+        power_lasers_active: false,
+        integrity: 100,
+        integrity_warning_75: false,
+        integrity_warning_50: false,
+        integrity_warning_25: false,
+        integrity_critical: false,
+        running_time: 0,
+        frame: 0
+    };
+    last_time = Date.now();
+    log_error("[RESET] All systems returned to nominal state");
+}
+
+function laser_level(level) {
+    dmr.power_laser_level = level;
+    play_sound("center position.wav");
+    log_error("[LASER] Power laser set to level " + level);
+}
+
+function adjust_coolant(speed) {
+    dmr.coolant_pump_speed = speed;
+    play_sound("center position.wav");
+    log_error("[COOLANT] Pump speed adjusted to " + speed + "%");
+}
+
+function adjust_efficiency(eff) {
+    dmr.thermal_efficiency = eff;
+    log_error("[THERMAL] Efficiency set to " + eff + "%");
+}
+
+function maximize_efficiency() {
+    dmr.thermal_efficiency = 100;
+    dmr.coolant_pump_speed = 100;
+    play_sound("QSERF Voice Lines II Successful Ending Phase One.wav");
+    log_error("[OPTIMIZE] All thermal systems optimized");
+}
+
+function check_fuel_cells() {
+    log_error("[FUEL] Cell 1: " + dmr.fuel_cell_1.toFixed(1) + "% | Cell 2: " + dmr.fuel_cell_2.toFixed(1) + "% | Cell 3: " + dmr.fuel_cell_3.toFixed(1) + "% (DEFECTIVE)");
+}
+
+function eject_fuel(cell) {
+    if (cell === 1) {
+        dmr.fuel_cell_1 = 0;
+        dmr.fuel_ejection_times[0] = dmr.running_time;
+    }
+    if (cell === 2) {
+        dmr.fuel_cell_2 = 0;
+        dmr.fuel_ejection_times[1] = dmr.running_time;
+    }
+    if (cell === 3) {
+        dmr.fuel_cell_3 = 0;
+        dmr.fuel_ejection_times[2] = dmr.running_time;
+    }
+    play_sound("Failure (1).wav");
+    log_error("[EJECTION] Fuel cell " + cell + " ejected at T+" + dmr.running_time.toFixed(2) + "s");
+    
+    if (dmr.fuel_cell_1 === 0 && dmr.fuel_cell_2 === 0 && dmr.fuel_cell_3 === 0) {
+        var times = dmr.fuel_ejection_times.filter(t => t !== null);
+        if (times.length === 3) {
+            var timeDiff = Math.max(...times) - Math.min(...times);
+            log_error("[EJECTION] All fuel cells ejected - Time spread: " + timeDiff.toFixed(2) + "s");
+            if (timeDiff >= 1 && timeDiff <= 3) {
+                log_error("[SUCCESS] Window valid! Emergency combustion stall successful!");
+            } else {
+                log_error("[FAILED] Ejection window invalid (" + timeDiff.toFixed(2) + "s) - reactor remains critical!");
+            }
+        }
+    }
+}
+
+function toggle_containment() {
+    dmr.containment_field = dmr.containment_field > 50 ? 0 : 100;
+    log_error("[CONTAINMENT] Field toggled to " + dmr.containment_field.toFixed(0) + "%");
+}
+
+function boost_shields() {
+    dmr.radiation_shield = Math.min(100, dmr.radiation_shield + 20);
+    log_error("[SHIELDS] Radiation shields boosted to " + dmr.radiation_shield.toFixed(0) + "%");
+}
+
+function check_seals() {
+    var avg = (dmr.pressure_seals[0] + dmr.pressure_seals[1] + dmr.pressure_seals[2]) / 3;
+    log_error("[SEALS] Integrity check: A:" + dmr.pressure_seals[0].toFixed(0) + "% B:" + dmr.pressure_seals[1].toFixed(0) + "% C:" + dmr.pressure_seals[2].toFixed(0) + "% AVG:" + avg.toFixed(0) + "%");
+}
+
+function reinforce_seals() {
+    for (var i = 0; i < 3; i++) {
+        dmr.pressure_seals[i] = Math.min(100, dmr.pressure_seals[i] + 15);
+    }
+    dmr.pressure_purge_warning = false;
+    log_error("[SEALS] All pressure seals reinforced");
+}
+
+function check_support() {
+    var avg = 0;
+    for (var i = 0; i < 6; i++) avg += dmr.fission_reactors[i];
+    avg /= 6;
+    log_error("[SUPPORT] Fission reactors average health: " + avg.toFixed(0) + "%");
+}
+
+function boost_support() {
+    for (var i = 0; i < 6; i++) {
+        dmr.fission_reactors[i] = Math.min(100, dmr.fission_reactors[i] + 25);
+    }
+    log_error("[SUPPORT] All support reactors boosted");
+}
+
+function shutdown_support() {
+    for (var i = 0; i < 6; i++) {
+        dmr.fission_reactors[i] = 0;
+    }
+    log_error("[SUPPORT] All fission reactors shut down");
+}
+
+function test_fission(idx) {
+    log_error("[TEST] Fission reactor " + idx + " test cycle complete: " + dmr.fission_reactors[idx-1].toFixed(0) + "% nominal");
+}
+
+function check_combustion() {
+    log_error("[COMBUSTION] Chamber temp: " + dmr.combustion_chamber_temp.toFixed(0) + " K - Efficiency: " + dmr.thermal_efficiency.toFixed(0) + "%");
+}
+
+function clear_alarms() {
+    log_error("[ALARMS] All alarm systems reset");
+    play_sound("center position.wav");
+}
+
+function radiation_scan() {
+    var rad_level = (dmr.power_output / dmr.target_power) * 100;
+    log_error("[RADIATION] Scan complete - Level: " + rad_level.toFixed(0) + "% | Shield: " + dmr.radiation_shield.toFixed(0) + "%");
+}
+
+function structural_check() {
+    log_error("[STRUCTURAL] Containment: " + dmr.containment_field.toFixed(0) + "% | Seals: " + ((dmr.pressure_seals[0] + dmr.pressure_seals[1] + dmr.pressure_seals[2]) / 3).toFixed(0) + "% - Status: NOMINAL");
+}
+
+function full_diagnostics() {
+    log_error("[DIAGNOSTIC] Full system check initiated...");
+    log_error("Temp: " + dmr.temperature.toFixed(0) + "K | Press: " + dmr.pressure.toFixed(1) + "% | Power: " + dmr.power_output.toFixed(2) + "GW | Fuel: " + ((dmr.fuel_cell_1 + dmr.fuel_cell_2 + dmr.fuel_cell_3) / 3).toFixed(1) + "%");
+}
+
+function check_critical() {
+    if (dmr.critical_warning) {
+        log_error("[CRITICAL] System in critical state! Emergency measures required!");
+        var countdowns = ["30 to 0.wav", "60 seconds.wav", "200 seconds.wav"];
+        play_sound(countdowns[Math.floor(Math.random() * countdowns.length)]);
+    } else {
+        log_error("[STATUS] All systems nominal");
+    }
+}
+
+setInterval(redraw, 100);
+log_error("[INIT] Dark Matter Reactor Control System Online");
+log_error("[INIT] Facility: Madison Research Institute - Dr. Helene Kaiser, Director");
+redraw();
+</script>
+
+</body>
+</html>

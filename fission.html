@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>QS-247 Fission Reactor Simulator</title>
+<style>
+body { font-family: monospace; margin: 0; padding: 10px; background: #000; color: #0f0; }
+.container { max-width: 1200px; margin: 0 auto; }
+.header { background: #003300; padding: 10px; margin-bottom: 10px; border: 2px solid #0f0; }
+.display { background: #001100; padding: 15px; margin: 10px 0; border: 1px solid #0f0; white-space: pre; font-size: 12px; min-height: 500px; }
+.controls { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 10px 0; }
+.control-group { background: #002200; padding: 10px; border: 1px solid #0f0; }
+.control-group h3 { margin: 0 0 10px 0; color: #0ff; }
+button { background: #003300; color: #0f0; border: 1px solid #0f0; padding: 8px; margin: 4px; cursor: pointer; font-family: monospace; font-weight: bold; }
+button:hover { background: #0f0; color: #000; }
+button:active { background: #00ff00; }
+.error-box { background: #330000; color: #ff6666; padding: 10px; margin: 10px 0; border: 2px solid #ff0000; max-height: 100px; overflow-y: auto; font-size: 11px; }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<div class="header">
+<h1>QS-247 STIRLING CONVERTER FISSION REACTOR</h1>
+<p>Certified by: QSST Devs and QAC</p>
+</div>
+
+<div class="error-box" id="errorlog">
+System ready...
+</div>
+
+<div class="display" id="display">
+Loading reactor systems...
+</div>
+
+<div class="controls">
+
+<div class="control-group">
+<h3>REACTOR CONTROL</h3>
+<button onclick="reactor_startup()">STARTUP</button>
+<button onclick="reactor_scram()">SCRAM</button>
+<button onclick="reactor_reset()">RESET</button>
+<button onclick="toggle_safety()">Toggle Safety</button>
+</div>
+
+<div class="control-group">
+<h3>CONTROL RODS</h3>
+<button onclick="rods_up()">Rods UP</button>
+<button onclick="rods_down()">Rods DOWN</button>
+<button onclick="rods_stop()">STOP</button>
+<button onclick="toggle_cr_speed()">Speed: <span id="crspeed">1x</span></button>
+<button onclick="toggle_cr_continuous()">Continuous: <span id="crcont">OFF</span></button>
+</div>
+
+<div class="control-group">
+<h3>THERMAL SYSTEM</h3>
+<button onclick="adjust_pump(105)">Pump +5%</button>
+<button onclick="adjust_pump(95)">Pump -5%</button>
+<button onclick="adjust_pump(100)">Pump RESET</button>
+<button onclick="toggle_thermal_loop()">Thermal Loop: <span id="tloop">OFF</span></button>
+</div>
+
+<div class="control-group">
+<h3>CONVERTERS</h3>
+<button onclick="toggle_converter(0)">Conv A: <span id="conv0">OFF</span></button>
+<button onclick="toggle_converter(1)">Conv B: <span id="conv1">OFF</span></button>
+<button onclick="toggle_converter(2)">Conv C: <span id="conv2">OFF</span></button>
+<button onclick="toggle_converter(3)">Conv D: <span id="conv3">OFF</span></button>
+</div>
+
+<div class="control-group">
+<h3>PRESSURE RELIEF</h3>
+<button onclick="toggle_relief(0)">Relief A: <span id="rel0">OFF</span></button>
+<button onclick="toggle_relief(1)">Relief B: <span id="rel1">OFF</span></button>
+<button onclick="toggle_relief(2)">Relief C: <span id="rel2">OFF</span></button>
+<button onclick="toggle_relief(3)">Relief D: <span id="rel3">OFF</span></button>
+</div>
+
+<div class="control-group">
+<h3>GRID</h3>
+<button onclick="toggle_grid_type()">Grid: <span id="gridtype">NONE</span></button>
+<button onclick="sync_grid()">SYNC with Grid</button>
+<button onclick="disconnect_grid()">DISCONNECT</button>
+</div>
+
+<div class="control-group">
+<h3>SUPPORT SYSTEMS</h3>
+<button onclick="test_support_rods()">Test Support</button>
+<button onclick="check_fuel()">Check Fuel</button>
+<button onclick="diagnostics()">Diagnostics</button>
+</div>
+
+</div>
+
+</div>
+
+<script>
+var error_messages = [];
+
+function log_error(msg) {
+    error_messages.push(msg);
+    if (error_messages.length > 15) error_messages.shift();
+    var div = document.getElementById("errorlog");
+    if (div) div.textContent = error_messages.join("\n");
+}
+
+function play_sound(filename) {
+    try {
+        var audio = new Audio("/Audio/" + filename);
+        audio.volume = 0.5;
+        audio.play().catch(function(e) {
+            log_error("Audio play failed: " + e.message);
+        });
+    } catch(e) {
+        log_error("Audio error: " + e.message);
+    }
+}
+
+window.onerror = function(msg, url, line) {
+    log_error("JS ERROR: " + msg + " (Line " + line + ")");
+    return false;
+};
+
+// ===== REACTOR STATE =====
+var reactor = {
+    state: "COLD",
+    running_time: 0,
+    frame: 0,
+    
+    // Temperature
+    core_avg_temp: 75,
+    sector_temps: [75, 75, 75, 75],
+    
+    // Pressure
+    pressure: 1000,
+    pressure_relief: [false, false, false, false],
+    
+    // Control rods
+    cr_insertion: 0,
+    cr_speed: 1,
+    cr_continuous: false,
+    cr_moving: false,
+    cr_direction: 0,
+    cr_stuck: false,
+    
+    // Neutron
+    neutron_flux: 0,
+    
+    // Power systems
+    thermal_loop_on: false,
+    thermal_inlet: false,
+    thermal_outlet: false,
+    converters: [false, false, false, false],
+    total_power: 0,
+    grid_connected: false,
+    grid_type: "NONE",
+    
+    // Thermal
+    coolant_pump_speed: 100,
+    thermal_efficiency: 100,
+    combustion_temp: 1800,
+    
+    // Support
+    support_reactors: [100, 100, 100, 100, 100, 100],
+    
+    // Safety
+    safety_enabled: true,
+    scram_engaged: false,
+    auto_scram: false,
+    
+    // Fuel
+    fuel_burnup: 0,
+    fuel_cells: [100, 100, 95]
+};
+
+var last_time = Date.now();
+
+function update_physics() {
+    var now = Date.now();
+    var dt = (now - last_time) / 1000;
+    last_time = now;
+    
+    if (dt > 0.2) dt = 0.2;
+    if (reactor.state === "COLD") return;
+    
+    // Update control rods
+    if (reactor.cr_moving && reactor.cr_continuous) {
+        var movement = 5 * reactor.cr_speed * dt * reactor.cr_direction;
+        reactor.cr_insertion = Math.max(0, Math.min(100, reactor.cr_insertion + movement));
+    }
+    
+    // Update neutron flux based on rods
+    if (reactor.cr_direction > 0 && reactor.cr_moving) {
+        reactor.neutron_flux = Math.min(20, reactor.neutron_flux + 0.15 * dt);
+    } else {
+        reactor.neutron_flux = Math.max(0, reactor.neutron_flux - 0.5 * dt);
+    }
+    
+    // Temperature update
+    for (var i = 0; i < 4; i++) {
+        var heat_from_fission = (100 - reactor.cr_insertion) * reactor.neutron_flux * 0.15;
+        var heat_from_combustion = (reactor.combustion_temp - 1800) * 0.02;
+        var total_heat = heat_from_fission + heat_from_combustion;
+        
+        var cooling = 0;
+        if (reactor.thermal_loop_on) {
+            cooling = (reactor.coolant_pump_speed / 100) * reactor.thermal_efficiency * 5;
+        }
+        
+        var temp_change = (total_heat - cooling) * dt;
+        reactor.sector_temps[i] += temp_change;
+        
+        if (reactor.sector_temps[i] < 75) reactor.sector_temps[i] = 75;
+        if (reactor.sector_temps[i] > 1200) reactor.sector_temps[i] = 1200;
+    }
+    
+    reactor.core_avg_temp = (reactor.sector_temps[0] + reactor.sector_temps[1] + reactor.sector_temps[2] + reactor.sector_temps[3]) / 4;
+    
+    // Pressure update
+    if (reactor.core_avg_temp > 100) {
+        reactor.pressure += (reactor.core_avg_temp - 100) * 0.5 * dt;
+    }
+    
+    var relief_active = 0;
+    for (var i = 0; i < 4; i++) {
+        if (reactor.pressure_relief[i]) relief_active++;
+    }
+    
+    if (relief_active > 0) {
+        reactor.pressure -= relief_active * 20 * dt;
+    }
+    
+    if (reactor.pressure < 1000) reactor.pressure = 1000;
+    if (reactor.pressure > 3000) reactor.pressure = 3000;
+    
+    // Power output
+    reactor.total_power = 0;
+    for (var i = 0; i < 4; i++) {
+        if (reactor.converters[i]) {
+            var conv_power = (100 - reactor.cr_insertion) * reactor.neutron_flux * 15;
+            reactor.total_power += conv_power;
+        }
+    }
+    
+    // Auto SCRAM
+    if (reactor.safety_enabled && (reactor.core_avg_temp > 1000 || reactor.pressure > 2800)) {
+        reactor.auto_scram = true;
+        reactor.scram_engaged = true;
+        reactor.cr_insertion = 100;
+        play_sound("code_red.wav");
+    }
+    
+    // Fuel burnup
+    if (reactor.state === "RUNNING") {
+        reactor.fuel_burnup += dt * 0.001;
+    }
+    
+    reactor.running_time += dt;
+}
+
+function redraw() {
+    reactor.frame++;
+    update_physics();
+    
+    var output = "";
+    output += "╔════════════════════════════════════════════════════════════════╗\n";
+    output += "║         QS-247 STIRLING CONVERTER FISSION REACTOR             ║\n";
+    output += "╚════════════════════════════════════════════════════════════════╝\n\n";
+    
+    output += "REACTOR STATE: " + reactor.state + "  |  TIME: " + reactor.running_time.toFixed(1) + "s  |  FRAME: " + reactor.frame + "\n\n";
+    
+    output += "┌─ CORE TEMPERATURE ─────────────────────────────────────────────┐\n";
+    output += "│ Average: " + reactor.core_avg_temp.toFixed(1) + "°C\n";
+    output += "│ Sector A (North): " + reactor.sector_temps[0].toFixed(1) + "°C\n";
+    output += "│ Sector B (South): " + reactor.sector_temps[1].toFixed(1) + "°C\n";
+    output += "│ Sector C (East):  " + reactor.sector_temps[2].toFixed(1) + "°C\n";
+    output += "│ Sector D (West):  " + reactor.sector_temps[3].toFixed(1) + "°C\n";
+    output += "└────────────────────────────────────────────────────────────────┘\n\n";
+    
+    output += "CONTROL RODS: " + reactor.cr_insertion.toFixed(1) + "%  |  NEUTRON FLUX: " + reactor.neutron_flux.toFixed(2) + "%\n";
+    output += "Rod Motion: " + (reactor.cr_moving ? (reactor.cr_direction > 0 ? "UP" : "DOWN") : "STOPPED") + "  |  Speed: " + reactor.cr_speed + "x\n";
+    output += "Continuous: " + (reactor.cr_continuous ? "ON" : "OFF") + "  |  Safety: " + (reactor.safety_enabled ? "ENABLED" : "DISABLED") + "\n\n";
+    
+    output += "SYSTEM PRESSURE: " + reactor.pressure.toFixed(0) + " PSI\n";
+    output += "Relief A: " + (reactor.pressure_relief[0] ? "OPEN" : "---") + "  |  Relief B: " + (reactor.pressure_relief[1] ? "OPEN" : "---") + "  |  Relief C: " + (reactor.pressure_relief[2] ? "OPEN" : "---") + "  |  Relief D: " + (reactor.pressure_relief[3] ? "OPEN" : "---") + "\n\n";
+    
+    output += "POWER OUTPUT: " + reactor.total_power.toFixed(0) + " kW\n";
+    output += "Conv A: " + (reactor.converters[0] ? "ON" : "OFF") + "  |  Conv B: " + (reactor.converters[1] ? "ON" : "OFF") + "  |  Conv C: " + (reactor.converters[2] ? "ON" : "OFF") + "  |  Conv D: " + (reactor.converters[3] ? "ON" : "OFF") + "\n";
+    output += "Grid: " + reactor.grid_type + "  |  Connected: " + (reactor.grid_connected ? "YES" : "NO") + "\n\n";
+    
+    output += "THERMAL SYSTEM:\n";
+    output += "Loop: " + (reactor.thermal_loop_on ? "ON" : "OFF") + "  |  Pump Speed: " + reactor.coolant_pump_speed.toFixed(0) + "%  |  Efficiency: " + reactor.thermal_efficiency.toFixed(0) + "%\n";
+    output += "Combustion Temp: " + reactor.combustion_temp.toFixed(0) + "K\n\n";
+    
+    output += "FUEL STATUS:\n";
+    output += "Burnup: " + reactor.fuel_burnup.toFixed(2) + "%  |  Cell 1: " + reactor.fuel_cells[0].toFixed(0) + "%  |  Cell 2: " + reactor.fuel_cells[1].toFixed(0) + "%  |  Cell 3: " + reactor.fuel_cells[2].toFixed(0) + "%\n\n";
+    
+    output += "SUPPORT REACTORS: ";
+    for (var i = 0; i < 6; i++) {
+        output += "R" + (i+1) + ":" + reactor.support_reactors[i].toFixed(0) + "%  ";
+    }
+    output += "\n\n";
+    
+    var alarms = [];
+    if (reactor.core_avg_temp > 900) alarms.push("HIGH TEMP");
+    if (reactor.pressure > 2500) alarms.push("OVERPRESSURE");
+    if (reactor.fuel_burnup > 80) alarms.push("FUEL CRITICAL");
+    if (reactor.scram_engaged) alarms.push("SCRAM ENGAGED");
+    
+    output += "ALARMS: " + (alarms.length > 0 ? alarms.join(" | ") : "NONE") + "\n";
+    
+    document.getElementById("display").textContent = output;
+    
+    // Update UI
+    document.getElementById("crspeed").textContent = reactor.cr_speed + "x";
+    document.getElementById("crcont").textContent = reactor.cr_continuous ? "ON" : "OFF";
+    document.getElementById("tloop").textContent = reactor.thermal_loop_on ? "ON" : "OFF";
+    for (var i = 0; i < 4; i++) {
+        document.getElementById("conv" + i).textContent = reactor.converters[i] ? "ON" : "OFF";
+        document.getElementById("rel" + i).textContent = reactor.pressure_relief[i] ? "ON" : "OFF";
+    }
+    document.getElementById("gridtype").textContent = reactor.grid_type;
+}
+
+function reactor_startup() {
+    if (reactor.state === "COLD") {
+        reactor.state = "RUNNING";
+        reactor.scram_engaged = false;
+        reactor.running_time = 0;
+        play_sound("startupopen.wav");
+        log_error("Reactor startup initiated...");
+    }
+}
+
+function reactor_scram() {
+    reactor.scram_engaged = true;
+    reactor.state = "SCRAM";
+    reactor.cr_insertion = 100;
+    reactor.cr_moving = false;
+    play_sound("Emergency-Shutdown-Activated.wav");
+    log_error("SCRAM ACTIVATED");
+}
+
+function reactor_reset() {
+    reactor.state = "COLD";
+    reactor.cr_insertion = 0;
+    reactor.core_avg_temp = 75;
+    reactor.sector_temps = [75, 75, 75, 75];
+    reactor.pressure = 1000;
+    reactor.neutron_flux = 0;
+    reactor.scram_engaged = false;
+    reactor.auto_scram = false;
+    reactor.running_time = 0;
+    reactor.total_power = 0;
+    play_sound("reactor_shutdown_lowering.wav");
+    log_error("Reactor reset to cold standby");
+}
+
+function rods_up() {
+    reactor.cr_moving = true;
+    reactor.cr_direction = 1;
+}
+
+function rods_down() {
+    reactor.cr_moving = true;
+    reactor.cr_direction = -1;
+}
+
+function rods_stop() {
+    reactor.cr_moving = false;
+    reactor.cr_direction = 0;
+}
+
+function toggle_cr_speed() {
+    reactor.cr_speed = reactor.cr_speed === 1 ? 2 : 1;
+}
+
+function toggle_cr_continuous() {
+    reactor.cr_continuous = !reactor.cr_continuous;
+}
+
+function adjust_pump(pct) {
+    reactor.coolant_pump_speed = Math.max(50, Math.min(150, pct));
+}
+
+function toggle_thermal_loop() {
+    reactor.thermal_loop_on = !reactor.thermal_loop_on;
+}
+
+function toggle_converter(idx) {
+    reactor.converters[idx] = !reactor.converters[idx];
+}
+
+function toggle_relief(idx) {
+    reactor.pressure_relief[idx] = !reactor.pressure_relief[idx];
+}
+
+function toggle_grid_type() {
+    var types = ["NONE", "PRIMARY", "AUXILIARY", "EXTERNAL"];
+    var idx = types.indexOf(reactor.grid_type);
+    reactor.grid_type = types[(idx + 1) % 4];
+}
+
+function sync_grid() {
+    if (reactor.grid_type === "AUXILIARY" && Math.abs(reactor.neutron_flux) < 2) {
+        reactor.grid_connected = true;
+        play_sound("center position.wav");
+        log_error("Grid synchronization successful!");
+    } else {
+        play_sound("Controls_Irresponsive.wav");
+        log_error("Cannot sync: wrong grid type or flux mismatch");
+    }
+}
+
+function disconnect_grid() {
+    reactor.grid_connected = false;
+    log_error("Disconnected from grid");
+}
+
+function toggle_safety() {
+    reactor.safety_enabled = !reactor.safety_enabled;
+}
+
+function test_support_rods() {
+    for (var i = 0; i < 6; i++) {
+        reactor.support_reactors[i] = 100;
+    }
+    log_error("Support reactors tested - all nominal");
+}
+
+function check_fuel() {
+    log_error("Fuel check: " + reactor.fuel_cells.map(c => c.toFixed(0) + "%").join(", "));
+}
+
+function diagnostics() {
+    log_error("Diagnostics: All systems nominal. Fuel burnup " + reactor.fuel_burnup.toFixed(2) + "%");
+}
+
+setInterval(redraw, 100);
+log_error("QS-247 Reactor Control System Online");
+redraw();
+</script>
+
+</body>
+</html>
