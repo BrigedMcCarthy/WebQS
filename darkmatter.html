@@ -43,10 +43,14 @@ Loading DMR control systems...
 <div class="controls">
 
 <div class="control-group">
+<h3>� STARTUP SEQUENCE (IN ORDER)</h3>
+<button onclick="prime_ignition()">1. PRIME IGNITION</button>
+<button onclick="raise_to_center()">2. RAISE TO CENTER</button>
+<button onclick="dmr_startup()">3. STARTUP SEQUENCE</button>
+</div>
+
+<div class="control-group">
 <h3>🔴 REACTOR CONTROL</h3>
-<button onclick="prime_ignition()">PRIME IGNITION</button>
-<button onclick="raise_to_center()">RAISE TO CENTER</button>
-<button onclick="dmr_startup()">STARTUP SEQUENCE</button>
 <button onclick="dmr_shutdown()">SHUTDOWN</button>
 <button onclick="dmr_scram()">EMERGENCY STALL</button>
 <button onclick="dmr_reset()">RESET SYSTEMS</button>
@@ -105,7 +109,12 @@ Loading DMR control systems...
 </div>
 
 <div class="control-group">
-<h3>📊 DIAGNOSTICS</h3>
+<h3>🌡️ MANUAL CONTROLS</h3>
+<input type="number" id="temp_input" placeholder="Enter temperature (K)" style="width: 200px; padding: 8px; margin: 5px;">
+<button onclick="set_temperature()">SET TEMPERATURE</button>
+</div>
+
+<div class="control-group">
 <button onclick="full_diagnostics()">Full Diagnostic</button>
 <button onclick="clear_alarms()">Clear Alarms</button>
 <button onclick="radiation_scan()">Radiation Scan</button>
@@ -127,11 +136,15 @@ function log_error(msg) {
 }
 
 function play_sound(filename) {
+    // If the audio doesn't play, the reactor is still broken, just silently
     try {
         var audio = new Audio("/Audio/" + filename);
         audio.volume = 0.6;
-        audio.play().catch(function(e) {});
-    } catch(e) {}
+        audio.play();
+    } catch(e) {
+        // Ignore it. Ignore EVERYTHING.
+        console.log("Audio error: " + e.message);
+    }
 }
 
 // ===== DMR STATE =====
@@ -168,35 +181,36 @@ var dmr = {
 var last_time = Date.now();
 
 function update_physics() {
+    // This function calculates things. I think. Honestly, I have no idea anymore.
     var now = Date.now();
     var dt = (now - last_time) / 1000;
     last_time = now;
     
-    if (dt > 0.2) dt = 0.2;
-    if (!dmr.operational) return;
+    if (dt > 0.2) dt = 0.2; // If lag spikes, just pretend it didn't happen
+    if (!dmr.operational) return; // Why even bother if nothing's working
     
     // Power laser affects combustion
     dmr.combustion_chamber_temp = 1800 + (dmr.power_laser_level * 400);
     
-    // Coolant affects temperature
+    // Coolant affects temperature (or does it? I've forgotten what physics even is)
     if (dmr.coolant_pump_speed < 50) {
-        dmr.temperature += 50 * dt;
+        dmr.temperature += 50 * dt; // Go hot.
     } else if (dmr.coolant_pump_speed > 100) {
-        dmr.temperature -= 20 * dt;
+        dmr.temperature -= 20 * dt; // Go cold. I don't make the rules (I do, and they're terrible)
     } else {
-        dmr.temperature = 3800 + (dmr.power_output - 30) * 20;
+        dmr.temperature = 3800 + (dmr.power_output - 30) * 20; // I genuinely don't know what this does
     }
     
-    // Fuel cell degradation (especially cell 3)
+    // Fuel cell degradation (especially cell 3 because it's basically haunted)
     dmr.fuel_cell_3 -= (0.1 + 0.2 * Math.random()) * dt;
-    if (dmr.fuel_cell_3 < 0) dmr.fuel_cell_3 = 0;
+    if (dmr.fuel_cell_3 < 0) dmr.fuel_cell_3 = 0; // Negative fuel is not allowed. I've checked.
     
-    // Pressure affected by power
+    // Pressure affected by power (this seems right? who knows anymore)
     dmr.pressure = 98 + (dmr.power_output / 30) * 10;
     
-    // Power output depends on fuel and coolant
+    // Power output depends on fuel and coolant (dark matter magic, mostly)
     var avg_fuel = (dmr.fuel_cell_1 + dmr.fuel_cell_2 + dmr.fuel_cell_3) / 3;
-    dmr.power_output = (avg_fuel / 100) * dmr.target_power * (dmr.coolant_pump_speed / 100);
+    dmr.power_output = (avg_fuel / 100) * dmr.target_power * (dmr.coolant_pump_speed / 100); // Please work. PLEASE.
     
     // Containment field degrades under stress
     if (dmr.temperature > 4500) {
@@ -386,61 +400,70 @@ function redraw() {
 }
 
 function prime_ignition() {
+    // Step 1: Pretend we're in control of this situation
     if (!dmr.ignition_primed) {
         dmr.ignition_primed = true;
-        play_sound("center position.wav");
         log_error("[IGNITION] Priming ignition systems...");
         log_error("[IGNITION] Raise reactor to CENTER position before engaging power lasers");
+        play_sound("center position.wav");
     } else {
-        log_error("[IGNITION] Already primed - proceed with startup sequence");
+        log_error("[IGNITION] Already primed - proceed with startup sequence (if you dare)");
+        play_sound("center position.wav");
     }
 }
 
 function raise_to_center() {
+    // Step 2: Hope the reactor actually moves
     if (dmr.ignition_primed && !dmr.raised_to_center) {
         dmr.raised_to_center = true;
-        log_error("[RAISE] Reactor raised to center position - ready for power laser engagement");
+        log_error("[RAISE] Reactor raised to center position - ready for power laser engagement (we think)");
+        play_sound("center position.wav");
     } else if (!dmr.ignition_primed) {
-        log_error("[ERROR] Ignition must be primed first!");
+        log_error("[ERROR] Ignition must be primed first! (Did you not read the instructions?)");
+        play_sound("Controls_Irresponsive.wav");
     } else {
-        log_error("[RAISE] Already at center position");
+        log_error("[RAISE] Already at center position (stop clicking buttons)");
+        play_sound("center position.wav");
     }
 }
 
 function dmr_startup() {
+    // Step 3: The point of no return. God help us all.
     if (!dmr.operational && dmr.ignition_primed && dmr.raised_to_center) {
+        
         dmr.operational = true;
         dmr.power_lasers_active = true;
         dmr.emergency_stall_ready = true;
         dmr.running_time = 0;
-        play_sound("startupopen.wav");
-        play_sound("dmr.wav");
-        log_error("[STARTUP] Power lasers engaged!");
+        log_error("[STARTUP] Power lasers engaged! (It's happening. It's actually happening.)");
         log_error("[STARTUP] Gravitational laser system online");
-        log_error("[STARTUP] Dark Matter Reactor initialization sequence complete");
+        log_error("[STARTUP] Dark Matter Reactor initialization sequence complete (for better or worse)");
+        play_sound("startupopen.wav");
+        setTimeout(function() { play_sound("dmr.wav"); }, 500);
     } else if (!dmr.ignition_primed) {
-        log_error("[ERROR] Ignition not primed!");
+        log_error("[ERROR] Ignition not primed! (Did you skip steps?)");
     } else if (!dmr.raised_to_center) {
-        log_error("[ERROR] Reactor not raised to center position!");
+        log_error("[ERROR] Reactor not raised to center position! (Follow the steps!)");
     } else {
-        log_error("[ERROR] Reactor already operational");
+        log_error("[ERROR] Reactor already operational (you can't start what's already started)");
     }
 }
 
 function dmr_shutdown() {
+    // Trying to stop the reactor while it's that hot is like trying to stop a freight train with your face
     if (dmr.temperature > 3000) {
+        log_error("[SHUTDOWN FAILED] Temperature too high for safe shutdown! (The reactor says 'no thanks')");
+        log_error("[SHUTDOWN FAILED] Reactor remains operational (you're stuck with it now)");
         play_sound("Failure (1).wav");
-        log_error("[SHUTDOWN FAILED] Temperature too high for safe shutdown!");
-        log_error("[SHUTDOWN FAILED] Reactor remains operational");
-        play_sound("reacopps.mp3");
+        setTimeout(function() { play_sound("reacopps.mp3"); }, 400);
         return;
     }
     dmr.operational = false;
     dmr.power_output = 0;
     dmr.power_lasers_active = false;
+    log_error("[SHUTDOWN] Dark Matter Reactor powering down... (finally, some peace)");
+    log_error("[SHUTDOWN] Reactor lowering into holding chamber for maintenance (and therapy)");
     play_sound("reactor_shutdown_lowering.wav");
-    log_error("[SHUTDOWN] Dark Matter Reactor powering down...");
-    log_error("[SHUTDOWN] Reactor lowering into holding chamber for maintenance");
 }
 
 function dmr_scram() {
@@ -495,15 +518,17 @@ function dmr_reset() {
 }
 
 function laser_level(level) {
+    // Crank the lasers to arbitrary level X
     dmr.power_laser_level = level;
+    log_error("[LASER] Power laser set to level " + level + " (please don't burn the lab down)");
     play_sound("center position.wav");
-    log_error("[LASER] Power laser set to level " + level);
 }
 
 function adjust_coolant(speed) {
+    // Pump it. Or don't pump it. Quantum mechanics, baby.
     dmr.coolant_pump_speed = speed;
+    log_error("[COOLANT] Pump speed adjusted to " + speed + "% (this might help, or make it worse)");
     play_sound("center position.wav");
-    log_error("[COOLANT] Pump speed adjusted to " + speed + "%");
 }
 
 function adjust_efficiency(eff) {
@@ -518,8 +543,23 @@ function maximize_efficiency() {
     log_error("[OPTIMIZE] All thermal systems optimized");
 }
 
+function set_temperature() {
+    // Manual temperature override (aka 'cheat mode for desperate measures')
+    var input = document.getElementById("temp_input");
+    var temp = parseFloat(input.value);
+    if (!isNaN(temp) && temp >= 0 && temp <= 10000) {
+        dmr.temperature = temp;
+        log_error("[MANUAL] Temperature set to " + temp.toFixed(0) + " K (we're in control! We're NOT in control.)");
+        play_sound("Dark-Matter-Core-Temp-safe-limits.mp3");
+        input.value = "";
+    } else {
+        log_error("[ERROR] Invalid temperature value (0-10000 K) - Math is hard");
+    }
+}
+
 function check_fuel_cells() {
     log_error("[FUEL] Cell 1: " + dmr.fuel_cell_1.toFixed(1) + "% | Cell 2: " + dmr.fuel_cell_2.toFixed(1) + "% | Cell 3: " + dmr.fuel_cell_3.toFixed(1) + "% (DEFECTIVE)");
+    play_sound("center position.wav");
 }
 
 function eject_fuel(cell) {
@@ -535,8 +575,8 @@ function eject_fuel(cell) {
         dmr.fuel_cell_3 = 0;
         dmr.fuel_ejection_times[2] = dmr.running_time;
     }
-    play_sound("Failure (1).wav");
     log_error("[EJECTION] Fuel cell " + cell + " ejected at T+" + dmr.running_time.toFixed(2) + "s");
+    play_sound("Failure (1).wav");
     
     if (dmr.fuel_cell_1 === 0 && dmr.fuel_cell_2 === 0 && dmr.fuel_cell_3 === 0) {
         var times = dmr.fuel_ejection_times.filter(t => t !== null);
@@ -555,16 +595,19 @@ function eject_fuel(cell) {
 function toggle_containment() {
     dmr.containment_field = dmr.containment_field > 50 ? 0 : 100;
     log_error("[CONTAINMENT] Field toggled to " + dmr.containment_field.toFixed(0) + "%");
+    play_sound("center position.wav");
 }
 
 function boost_shields() {
     dmr.radiation_shield = Math.min(100, dmr.radiation_shield + 20);
     log_error("[SHIELDS] Radiation shields boosted to " + dmr.radiation_shield.toFixed(0) + "%");
+    play_sound("center position.wav");
 }
 
 function check_seals() {
     var avg = (dmr.pressure_seals[0] + dmr.pressure_seals[1] + dmr.pressure_seals[2]) / 3;
     log_error("[SEALS] Integrity check: A:" + dmr.pressure_seals[0].toFixed(0) + "% B:" + dmr.pressure_seals[1].toFixed(0) + "% C:" + dmr.pressure_seals[2].toFixed(0) + "% AVG:" + avg.toFixed(0) + "%");
+    play_sound("center position.wav");
 }
 
 function reinforce_seals() {
@@ -573,6 +616,7 @@ function reinforce_seals() {
     }
     dmr.pressure_purge_warning = false;
     log_error("[SEALS] All pressure seals reinforced");
+    play_sound("center position.wav");
 }
 
 function check_support() {
@@ -580,6 +624,7 @@ function check_support() {
     for (var i = 0; i < 6; i++) avg += dmr.fission_reactors[i];
     avg /= 6;
     log_error("[SUPPORT] Fission reactors average health: " + avg.toFixed(0) + "%");
+    play_sound("center position.wav");
 }
 
 function boost_support() {
@@ -587,6 +632,7 @@ function boost_support() {
         dmr.fission_reactors[i] = Math.min(100, dmr.fission_reactors[i] + 25);
     }
     log_error("[SUPPORT] All support reactors boosted");
+    play_sound("center position.wav");
 }
 
 function shutdown_support() {
@@ -594,14 +640,17 @@ function shutdown_support() {
         dmr.fission_reactors[i] = 0;
     }
     log_error("[SUPPORT] All fission reactors shut down");
+    play_sound("reactor_shutdown_lowering.wav");
 }
 
 function test_fission(idx) {
     log_error("[TEST] Fission reactor " + idx + " test cycle complete: " + dmr.fission_reactors[idx-1].toFixed(0) + "% nominal");
+    play_sound("Reactor sound.wav");
 }
 
 function check_combustion() {
     log_error("[COMBUSTION] Chamber temp: " + dmr.combustion_chamber_temp.toFixed(0) + " K - Efficiency: " + dmr.thermal_efficiency.toFixed(0) + "%");
+    play_sound("center position.wav");
 }
 
 function clear_alarms() {
@@ -612,24 +661,29 @@ function clear_alarms() {
 function radiation_scan() {
     var rad_level = (dmr.power_output / dmr.target_power) * 100;
     log_error("[RADIATION] Scan complete - Level: " + rad_level.toFixed(0) + "% | Shield: " + dmr.radiation_shield.toFixed(0) + "%");
+    play_sound("center position.wav");
 }
 
 function structural_check() {
     log_error("[STRUCTURAL] Containment: " + dmr.containment_field.toFixed(0) + "% | Seals: " + ((dmr.pressure_seals[0] + dmr.pressure_seals[1] + dmr.pressure_seals[2]) / 3).toFixed(0) + "% - Status: NOMINAL");
+    play_sound("center position.wav");
 }
 
 function full_diagnostics() {
     log_error("[DIAGNOSTIC] Full system check initiated...");
     log_error("Temp: " + dmr.temperature.toFixed(0) + "K | Press: " + dmr.pressure.toFixed(1) + "% | Power: " + dmr.power_output.toFixed(2) + "GW | Fuel: " + ((dmr.fuel_cell_1 + dmr.fuel_cell_2 + dmr.fuel_cell_3) / 3).toFixed(1) + "%");
+    play_sound("center position.wav");
 }
 
 function check_critical() {
+    // Let's see if we're in hot water (literally)
     if (dmr.critical_warning) {
-        log_error("[CRITICAL] System in critical state! Emergency measures required!");
+        log_error("[CRITICAL] System in critical state! Emergency measures required! (PANIC MODE ACTIVATED)");
         var countdowns = ["30 to 0.wav", "60 seconds.wav", "200 seconds.wav"];
         play_sound(countdowns[Math.floor(Math.random() * countdowns.length)]);
     } else {
-        log_error("[STATUS] All systems nominal");
+        log_error("[STATUS] All systems nominal (for now... for now...)");
+        play_sound("center position.wav");
     }
 }
 
