@@ -1,0 +1,14 @@
+{
+  "name": "webqs-template",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start-sse": "node server_sse.js",
+    "start-ws": "node ws_server.js",
+    "start-static": "python -m http.server 8000"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "ws": "^8.13.0"
+  }
+}
