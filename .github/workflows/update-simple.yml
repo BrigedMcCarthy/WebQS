@@ -11,15 +11,15 @@ jobs:
       # Check out the repo so we can edit files
       - uses: actions/checkout@v3
 
-      # Update simple.txt with the provided message or a default timestamp
+      # Update simple.txt with a hardcoded message
       - name: Update simple.txt
         run: |
-          MESSAGE="${{ github.event.inputs.message }}"
-          if [ -z "$MESSAGE" ]; then
-            MESSAGE="Updated ata hardcoded message
-      - name: Update simple.txt
-        run: |
-          MESSAGE="Your custom text here": Commit and push
+          MESSAGE="Your custom text here"
+          echo "$MESSAGE" > simple.txt
+          echo "✓ Updated simple.txt with: $MESSAGE"
+
+      # Commit and push the changes
+      - name: Commit and push
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
