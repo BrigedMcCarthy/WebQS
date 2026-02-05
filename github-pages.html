@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>WebQS — GitHub Pages Live Update</title>
+  <style>
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;max-width:900px;margin:24px}
+    header{display:flex;align-items:center;gap:12px}
+    pre{background:#f7f7f7;padding:12px;border-radius:6px;white-space:pre-wrap}
+    .controls{margin:12px 0}
+    button{margin-right:8px}
+    .status{background:#e8f5e9;padding:8px;border-radius:4px;margin-top:12px}
+    .error{background:#ffebee;color:#c62828}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>WebQS — GitHub Pages Live Updates</h1>
+  </header>
+
+  <p>This template uses <strong>polling</strong> to fetch updates from a static JSON file. Works on GitHub Pages!</p>
+
+  <div class="controls">
+    <label for="interval">Poll interval (ms):</label>
+    <input type="number" id="interval" value="2000" min="500" />
+    <button id="start">Start</button>
+    <button id="stop" disabled>Stop</button>
+  </div>
+
+  <section>
+    <h3>Live Output</h3>
+    <pre id="output">(no data yet)</pre>
+  </section>
+
+  <section>
+    <h3>Status</h3>
+    <div id="status" class="status">Ready. Click Start to begin polling from <code>data.json</code>.</div>
+  </section>
+
+  <section>
+    <h3>How It Works</h3>
+    <ul>
+      <li>This page continuously fetches <code>data.json</code> every 2 seconds (adjustable).</li>
+      <li>Updates the UI with new data when it changes.</li>
+      <li>Works on GitHub Pages with no server required.</li>
+      <li>To update data: edit <code>data.json</code> or use GitHub Actions (see README).</li>
+    </ul>
+  </section>
+
+  <script>
+    const intervalInput = document.getElementById('interval');
+    const startBtn = document.getElementById('start');
+    const stopBtn = document.getElementById('stop');
+    const out = document.getElementById('output');
+    const statusEl = document.getElementById('status');
+
+    // State for polling
+    let pollInterval = null;
+    let lastData = null;
+    let pollCount = 0;
+
+    // append: helper that writes a timestamped message to the <pre>
+    function append(data) {
+      const time = new Date().toLocaleTimeString();
+      out.textContent = `[${time}] ` + (typeof data === 'string' ? data : JSON.stringify(data, null, 2));
+    }
+
+    // updateStatus: log a status message
+    function updateStatus(msg, isError = false) {
+      const time = new Date().toLocaleTimeString();
+      const line = `[${time}] ${msg}`;
+      statusEl.textContent = line;
+      if (isError) statusEl.classList.add('error');
+      else statusEl.classList.remove('error');
+    }
+
+    /*
+      Polling from a static JSON file
+      - Fetches `data.json` at regular intervals (cache disabled to ensure fresh data).
+      - Compares the new data with the last fetched data.
+      - Only updates the UI if data has actually changed (to reduce jitter).
+      - Pros: simple, works on GitHub Pages, no server needed.
+      - Cons: can have latency between when data changes and when client sees it.
+    */
+    async function startPolling() {
+      const interval = parseInt(intervalInput.value, 10) || 2000;
+      updateStatus('Starting polling...');
+      pollCount = 0;
+
+      async function refresh() {
+        try {
+          // Fetch data.json with cache disabled to always get fresh data
+          const r = await fetch('data.json', { cache: 'no-store' });
+          if (!r.ok) throw new Error(`HTTP ${r.status}`);
+          const json = await r.json();
+
+          // Check if data has changed to avoid unnecessary UI updates
+          const jsonStr = JSON.stringify(json);
+          if (lastData !== jsonStr) {
+            lastData = jsonStr;
+            append(json);
+            updateStatus(`Data updated (poll #${++pollCount})`);
+          } else {
+            updateStatus(`Polling... (no change, #${++pollCount})`);
+          }
+        } catch (e) {
+          updateStatus(`Poll error: ${e.message}`, true);
+          append(`Error: ${e.message}`);
+        }
+      }
+
+      // Fetch once immediately, then set interval
+      await refresh();
+      pollInterval = setInterval(refresh, interval);
+    }
+
+    // stopAll: stop polling and clean up
+    function stopAll() {
+      if (pollInterval) {
+        clearInterval(pollInterval);
+        pollInterval = null;
+        updateStatus('Polling stopped');
+        append('Stopped');
+      }
+    }
+
+    // Wire up UI buttons
+    startBtn.addEventListener('click', () => {
+      startBtn.disabled = true;
+      stopBtn.disabled = false;
+      out.textContent = '';
+      startPolling();
+    });
+
+    stopBtn.addEventListener('click', () => {
+      stopAll();
+      startBtn.disabled = false;
+      stopBtn.disabled = true;
+    });
+  </script>
+</body>
+</html>

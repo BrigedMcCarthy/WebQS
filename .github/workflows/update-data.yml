@@ -1,0 +1,41 @@
+name: Update Data
+
+# Run on a schedule: every 5 minutes
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  # Allow manual trigger from Actions tab
+  workflow_dispatch:
+
+jobs:
+  update-data:
+    runs-on: ubuntu-latest
+    steps:
+      # Check out the repo so we can edit files
+      - uses: actions/checkout@v3
+
+      # Use Node.js to modify data.json
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      # Run a script that updates data.json
+      - name: Update data.json
+        run: |
+          node -e "
+          const fs = require('fs');
+          const data = JSON.parse(fs.readFileSync('data.json', 'utf8'));
+          data.timestamp = new Date().toISOString();
+          data.update_count = (data.update_count || 0) + 1;
+          data.message = 'Updated at ' + new Date().toLocaleString();
+          fs.writeFileSync('data.json', JSON.stringify(data, null, 2));
+          console.log('Updated data.json');
+          "
+
+      # Commit and push the changes
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data.json
+          git diff --cached --quiet || (git commit -m "chore: auto-update data.json" && git push)

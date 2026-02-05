@@ -49,6 +49,34 @@ Notes
 - For production, secure WebSocket and SSE endpoints (TLS) and handle reconnection/backoff.
 - The template app uses `simple.txt` for polling; replace with your API or endpoint.
 
+## GitHub Pages Deployment
+
+Since GitHub Pages only serves static files, you can use the **polling template** which fetches from a JSON file:
+
+1. Open `github-pages.html` in your browser (or serve it locally for testing).
+2. The page polls `data.json` every 2 seconds (adjustable).
+3. To trigger updates, either:
+   - Manually edit `data.json` and push to your repo.
+   - Let the GitHub Actions workflow auto-update it every 5 minutes (see below).
+
+**Setup automatic updates with GitHub Actions:**
+
+- The workflow `.github/workflows/update-data.yml` runs every 5 minutes and bumps `data.json`.
+- It will only commit if data actually changed (to avoid noise).
+- To modify the schedule, edit the `cron` line in the workflow file.
+
+**To deploy on GitHub Pages:**
+
+```bash
+git add github-pages.html data.json .github/workflows/update-data.yml
+git commit -m "Add GitHub Pages live update template"
+git push origin main
+```
+
+Then enable Pages under repo Settings → Pages → deploy from `main` branch.
+
+---
+
 **Credits**
 
 - Template created and documented by the project owner with assistance from GitHub Copilot.
