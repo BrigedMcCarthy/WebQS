@@ -13,11 +13,11 @@ wss.on('connection', function connection(ws) {
   // Send a small JSON welcome payload to the client right away.
   ws.send(JSON.stringify({ msg: 'welcome', time: new Date().toISOString() }));
 
-  // Periodically send a 'tick' message every 2s. In real apps, replace with real events.
+  // Periodically send a 'tick' message every 1s. In real apps, replace with real events.
   let i = 0;
   const iv = setInterval(() => {
     ws.send(JSON.stringify({ msg: 'tick ' + (++i), time: new Date().toISOString() }));
-  }, 2000);
+  }, 1000);
 
   // Log messages received from the client. You can parse JSON here if the client sends structured data.
   ws.on('message', function message(data) {

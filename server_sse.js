@@ -1,5 +1,11 @@
 const express = require('express');
+const fs = require('fs');
+const path = require('path');
 const app = express();
+
+// Middleware to parse JSON and text bodies
+app.use(express.json());
+app.use(express.text());
 
 // Serve static files from the repository root so the client can fetch index.html and simple.txt
 app.use(express.static('.'));
@@ -29,6 +35,36 @@ app.get('/events', (req, res) => {
   req.on('close', () => {
     clearInterval(iv);
   });
+});
+
+/*
+  POST endpoint: /save-message
+  - Accepts a JSON payload with { user: '1' or '2', message: 'text' }
+  - Writes the message to the corresponding user file (user1.txt or user2.txt)
+*/
+app.post('/save-message', (req, res) => {
+  try {
+    const { user, message } = req.body;
+    
+    if (!user || !['1', '2'].includes(user)) {
+      return res.status(400).json({ error: 'Invalid user. Must be "1" or "2"' });
+    }
+    
+    if (message === undefined) {
+      return res.status(400).json({ error: 'Message field is required' });
+    }
+    
+    const filename = `user${user}.txt`;
+    const filepath = path.join(__dirname, filename);
+    
+    // Write the message to the file
+    fs.writeFileSync(filepath, String(message), 'utf8');
+    
+    res.json({ success: true, file: filename });
+  } catch (err) {
+    console.error('Error saving message:', err);
+    res.status(500).json({ error: 'Failed to save message: ' + err.message });
+  }
 });
 
 // Start the server on the configured port.

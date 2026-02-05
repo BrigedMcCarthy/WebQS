@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <!-- Created with Microsoft FrontPage 3.0 -->
+  <!-- ============================================
+       ProtoWebchat(tm) - 1999
+       Best viewed at 800x600 resolution
+       ============================================ -->
+  <title>ProtoWebchat - Send Message</title>
+  <style>
+    * { margin: 0; padding: 0; }
+    
+    body {
+      background: repeating-linear-gradient(90deg, #ff00ff, #ff00ff 15px, #008080 15px, #008080 30px);
+      font-family: Comic Sans MS, Verdana, sans-serif;
+      font-size: 12px;
+      color: #000000;
+      min-height: 100vh;
+    }
+    
+    body::before {
+      content: ">>>>> ProtoWebchat MESSAGE CENTER <<<< POWERED BY FRONTPAGE 3.0 >>>>";
+      display: block;
+      background: #000080;
+      color: #00ffff;
+      padding: 8px;
+      text-align: center;
+      font-weight: bold;
+      font-size: 13px;
+      border: 5px dashed #ffff00;
+      animation: blink 0.6s infinite;
+      font-family: monospace;
+    }
+    
+    .window {
+      width: 90%;
+      max-width: 550px;
+      margin: 15px auto;
+      padding: 12px;
+      background: #ffff00;
+      border: 6px ridge;
+      border-color: #ffffff #000000 #000000 #ffffff;
+      box-shadow: 8px 8px 0 #000000;
+    }
+    
+    .title-bar {
+      background: linear-gradient(to right, #ff0000, #ffff00, #ff0000);
+      color: #000080;
+      padding: 6px 8px;
+      font-weight: bold;
+      font-size: 14px;
+      margin: -12px -12px 12px -12px;
+      text-align: center;
+      border-bottom: 4px outset #ffffff;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      animation: blink 0.7s infinite;
+    }
+    
+    h2 {
+      color: #ff0000;
+      font-size: 18px;
+      margin: 8px 0;
+      text-shadow: 2px 2px #008080;
+      background: #00ffff;
+      padding: 6px;
+      border: 3px solid #000000;
+      text-transform: uppercase;
+    }
+    
+    .field-group {
+      margin: 12px 0;
+      padding: 10px;
+      background: #c0c0c0;
+      border: 4px outset #ffffff;
+      box-shadow: 3px 3px 0 #000000;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: bold;
+      color: #000080;
+      text-transform: uppercase;
+      font-size: 11px;
+      text-shadow: 1px 1px #ffffff;
+    }
+    
+    select, textarea {
+      background-color: #ffffff;
+      color: #000000;
+      border: 3px outset #dfdfdf;
+      padding: 5px;
+      font-family: Comic Sans MS, Verdana, sans-serif;
+      font-size: 11px;
+      width: 100%;
+      box-sizing: border-box;
+      font-weight: bold;
+    }
+    
+    textarea {
+      resize: vertical;
+      min-height: 120px;
+      background: #ffffcc;
+    }
+    
+    button {
+      background: linear-gradient(135deg, #00ff00, #ffff00);
+      color: #000000;
+      border: 4px outset #ffffff;
+      padding: 8px 18px;
+      font-family: Comic Sans MS, Verdana, sans-serif;
+      font-size: 12px;
+      font-weight: bold;
+      cursor: pointer;
+      text-transform: uppercase;
+      box-shadow: 4px 4px 0 #000000;
+      transition: 0.02s;
+    }
+    
+    button:active {
+      border-style: inset;
+      box-shadow: inset 2px 2px 0 #000000, 2px 2px 0 #ffffff;
+    }
+    
+    .button-row {
+      margin: 12px 0;
+      display: flex;
+      gap: 6px;
+    }
+    
+    .status {
+      margin: 10px 0;
+      padding: 8px;
+      border: 4px double #000000;
+      display: none;
+      font-weight: bold;
+      text-align: center;
+      font-size: 13px;
+    }
+    
+    .status.success {
+      background-color: #00ff00;
+      color: #000000;
+      display: block;
+      animation: blink 0.5s infinite;
+    }
+    
+    .status.error {
+      background-color: #ff0000;
+      color: #ffff00;
+      display: block;
+    }
+    
+    .info-box {
+      background-color: #00ffff;
+      border: 4px ridge #000080;
+      padding: 10px;
+      margin: 12px 0;
+      font-size: 11px;
+      line-height: 1.6;
+      color: #000000;
+      font-weight: bold;
+      box-shadow: 4px 4px 0 #000000;
+    }
+    
+    .status-bar {
+      background: linear-gradient(to right, #0000ff, #ff00ff, #0000ff);
+      border-top: 4px ridge #ffffff;
+      padding: 6px 8px;
+      font-size: 11px;
+      color: #ffff00;
+      display: flex;
+      justify-content: space-between;
+      margin: 12px -12px -12px -12px;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+    
+    a {
+      color: #0000ff;
+      text-decoration: underline;
+      font-weight: bold;
+    }
+    
+    a:visited {
+      color: #800080;
+    }
+    
+    a:hover {
+      background: #ffff00;
+      color: #000080;
+    }
+    
+    @keyframes blink {
+      0%, 49% { opacity: 1; }
+      50%, 100% { opacity: 0.4; }
+    }
+  </style>
+</head>
+<body>
+  <div class="window">
+    <div class="title-bar">✉️ MESSAGE SEND CENTER ✉️</div>
+    
+    <div class="field-group">
+      <h2>📝 NEW MESSAGE</h2>
+      <label>👤 SEND TO:</label>
+      <select id="user">
+        <option value="1">🔵 User 1</option>
+        <option value="2">🔴 User 2</option>
+      </select>
+    </div>
+    
+    <div class="field-group">
+      <label>💬 YOUR MESSAGE:</label>
+      <textarea id="message" placeholder="Type your message here... Press Ctrl+Enter to send!"></textarea>
+    </div>
+    
+    <div class="button-row">
+      <button id="send">🚀 SEND MESSAGE 🚀</button>
+    </div>
+    
+    <div id="status" class="status"></div>
+    
+    <div class="info-box">
+      💡 INSTRUCTIONS 💡<br>
+      ▶ Select which user to send to<br>
+      ▶ Type your message<br>
+      ▶ Click SEND or press Ctrl+Enter<br>
+      ▶ Check the monitor to see replies!
+    </div>
+    
+    <div class="status-bar">ProtoWebchat™ 1.0 | Status: Ready | 1999</div>
+  </div>
+
+  <script>
+    const userSelect = document.getElementById('user');
+    const messageTextarea = document.getElementById('message');
+    const sendBtn = document.getElementById('send');
+    const statusDiv = document.getElementById('status');
+
+    messageTextarea.focus();
+
+    sendBtn.addEventListener('click', async () => {
+      const user = userSelect.value;
+      const message = messageTextarea.value.trim();
+
+      if (!message) {
+        showStatus('Please enter a message', 'error');
+        return;
+      }
+
+      try {
+        const response = await fetch('/save-message', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ user, message })
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.error || 'Failed to send message');
+        }
+
+        showStatus('Message sent to User ' + user, 'success');
+        messageTextarea.value = '';
+        messageTextarea.focus();
+      } catch (err) {
+        showStatus('Error: ' + err.message, 'error');
+      }
+    });
+
+    messageTextarea.addEventListener('keydown', (e) => {
+      if (e.ctrlKey || e.metaKey) {
+        if (e.key === 'Enter') {
+          sendBtn.click();
+        }
+      }
+    });
+
+    function showStatus(message, type) {
+      statusDiv.textContent = message;
+      statusDiv.className = 'status ' + type;
+      
+      if (type === 'success') {
+        setTimeout(() => {
+          statusDiv.className = 'status';
+        }, 3000);
+      }
+    }
+  </script>
+  <!-- Created with Microsoft FrontPage 3.0 - ProtoWebchat(tm) 1999 -->
+</body>
+</html>

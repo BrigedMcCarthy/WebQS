@@ -3,140 +3,372 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Dynamic Update Template</title>
+  <!-- Created with Microsoft FrontPage 98 -->
+  <!-- ============================================
+       ProtoWebchat(tm) - Created 1999
+       Best viewed at 640x480 or higher
+       ============================================ -->
+  <title>ProtoWebchat - Chat System</title>
   <style>
-    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;max-width:900px;margin:24px}
-    header{display:flex;align-items:center;gap:12px}
-    pre{background:#f7f7f7;padding:12px;border-radius:6px;white-space:pre-wrap}
-    .controls{margin:12px 0}
-    button{margin-right:8px}
+    * { margin: 0; padding: 0; }
+    
+    body {
+      background: repeating-linear-gradient(45deg, #ffff00, #ffff00 10px, #000080 10px, #000080 20px);
+      font-family: Comic Sans MS, Verdana, sans-serif;
+      font-size: 12px;
+      color: #000000;
+      overflow-x: hidden;
+    }
+    
+    body::before {
+      content: "★★★ WELCOME TO ProtoWebchat ™ CREATED WITH FRONTPAGE 98 ★★★";
+      display: block;
+      background: #ff0000;
+      color: #ffff00;
+      padding: 8px;
+      text-align: center;
+      font-weight: bold;
+      font-size: 14px;
+      border: 4px solid #008000;
+      border-style: ridge;
+      animation: blink 0.5s infinite;
+    }
+    
+    body::after {
+      content: "You are visitor #" counter(visitors) " | Best viewed in Internet Explorer 5.0 | 800x600 Resolution | © 1999 ProtoWebchat™";
+      display: block;
+      background: #008080;
+      color: #ffff00;
+      padding: 6px;
+      text-align: center;
+      font-size: 11px;
+      border: 3px solid #ff0000;
+      margin-top: 20px;
+    }
+    
+    .window {
+      max-width: 700px;
+      margin: 15px auto;
+      padding: 10px;
+      background: repeating-linear-gradient(90deg, #c0c0c0, #c0c0c0 20px, #ffffff 20px, #ffffff 22px);
+      border: 8px ridge;
+      border-color: #dfdfdf #808080 #808080 #dfdfdf;
+    }
+    
+    .title-bar {
+      background: linear-gradient(to right, #000080, #0000ff, #000080);
+      color: #ffff00;
+      padding: 4px 8px;
+      font-weight: bold;
+      font-size: 14px;
+      margin: -10px -10px 10px -10px;
+      text-align: center;
+      border-bottom: 4px outset #c0c0c0;
+      animation: blink 1s infinite;
+    }
+    
+    h1, h2 {
+      color: #ff0000;
+      font-size: 20px;
+      text-shadow: 2px 2px #008000;
+      margin: 10px 0;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+    
+    h3 {
+      color: #0000ff;
+      font-size: 16px;
+      margin: 12px 0 8px 0;
+      text-decoration: underline;
+      background: #ffff00;
+      padding: 4px;
+      border: 2px solid #000000;
+    }
+    
+    p {
+      margin: 8px 0;
+      line-height: 1.6;
+      background: #ffffff;
+      padding: 6px;
+      border: 2px inset #c0c0c0;
+    }
+    
+    .field-group {
+      margin: 10px 0;
+      padding: 8px;
+      background: #c0c0c0;
+      border: 3px outset #dfdfdf;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: bold;
+      color: #000080;
+      text-transform: uppercase;
+      font-size: 11px;
+    }
+    
+    select {
+      background-color: #00ffff;
+      color: #000000;
+      border: 3px outset #dfdfdf;
+      padding: 4px;
+      font-family: Comic Sans MS, Verdana;
+      font-size: 11px;
+      width: 100%;
+      box-sizing: border-box;
+      font-weight: bold;
+    }
+    
+    button {
+      background: linear-gradient(to bottom, #ffff00, #ff8000);
+      color: #000000;
+      border: 3px outset #dfdfdf;
+      padding: 6px 16px;
+      font-family: Comic Sans MS, Verdana;
+      font-size: 12px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-right: 6px;
+      text-transform: uppercase;
+      transition: 0.05s;
+    }
+    
+    button:active {
+      border-style: inset;
+      box-shadow: inset 2px 2px 0 #808080;
+    }
+    
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    .button-row {
+      margin: 10px 0;
+    }
+    
+    pre {
+      background-color: #000000;
+      color: #00ff00;
+      padding: 10px;
+      border: 3px inset #008000;
+      font-family: Courier New, monospace;
+      font-size: 11px;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      margin: 8px 0;
+      min-height: 60px;
+      text-shadow: 0 0 8px #00ff00;
+    }
+    
+    .status-bar {
+      background: linear-gradient(to right, #008080, #00ffff);
+      border-top: 3px ridge #c0c0c0;
+      padding: 4px 8px;
+      font-size: 11px;
+      color: #ffffff;
+      display: flex;
+      justify-content: space-between;
+      margin: 10px -10px -10px -10px;
+      font-weight: bold;
+    }
+    
+    .section {
+      margin: 12px 0;
+      padding: 8px;
+      background: #ffffff;
+      border: 4px ridge #ff00ff;
+      box-shadow: 4px 4px 0 #000000;
+    }
+    
+    ul {
+      margin: 8px 0 8px 24px;
+      padding: 8px;
+      background: #ffff00;
+      border: 3px double #000000;
+    }
+    
+    li {
+      margin: 6px 0;
+      line-height: 1.5;
+      color: #000080;
+    }
+    
+    a {
+      color: #0000ff;
+      text-decoration: underline;
+      font-weight: bold;
+    }
+    
+    a:visited {
+      color: #800080;
+    }
+    
+    a:hover {
+      background: #ffff00;
+      color: #000000;
+    }
+    
+    code {
+      background: #ffff00;
+      border: 2px solid #000080;
+      padding: 2px 4px;
+      font-family: Courier New, monospace;
+      color: #ff0000;
+      font-weight: bold;
+    }
+    
+    .spacer {
+      height: 15px;
+      background: repeating-linear-gradient(90deg, #ff0000, #ff0000 8px, #00ff00 8px, #00ff00 16px, #0000ff 16px, #0000ff 24px, #ffff00 24px, #ffff00 32px);
+      border: 3px solid #000000;
+      margin: 15px 0;
+    }
+    
+    @keyframes blink {
+      0%, 49% { opacity: 1; }
+      50%, 100% { opacity: 0.3; }
+    }
+    
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
   </style>
 </head>
 <body>
-  <header>
-    <h1>Dynamic Update Template</h1>
-  </header>
-
-  <p>This template demonstrates three techniques you can reuse: Polling (fetch), Server‑Sent Events (SSE), and WebSocket. Pick a mode and click <strong>Start</strong>.</p>
-
-  <div class="controls">
-    <label for="mode">Mode:</label>
-    <select id="mode">
-      <option value="poll">Polling (fetch)</option>
-      <option value="sse">Server‑Sent Events (SSE)</option>
-      <option value="ws">WebSocket</option>
-    </select>
-    <button id="start">Start</button>
-    <button id="stop" disabled>Stop</button>
+  <div class="window">
+    <div class="title-bar">📧 ProtoWebchat™ Chat Monitor 📧</div>
+    
+    <div class="section">
+      <h1>📧 LIVE CHAT MONITOR 🔴 CONNECTED 🔴</h1>
+      
+      <div class="field-group">
+        <label>👤 USER 1 MESSAGE OUTPUT:</label>
+        <pre id="output">(waiting for messages...)</pre>
+      </div>
+      
+      <div class="field-group">
+        <label>👥 USER 2 MESSAGE OUTPUT:</label>
+        <pre id="output2">(waiting for messages...)</pre>
+      </div>
+    </div>
+    
+    <div class="spacer"></div>
+    
+    <h3>⚡ CONNECTION MODE:</h3>
+    <div class="field-group">
+      <select id="mode">
+        <option value="poll">📧 Polling (HTTP Refresh)</option>
+        <option value="sse">📡 Server Events</option>
+        <option value="ws">🌐 WebSocket</option>
+      </select>
+    </div>
+    
+    <div class="button-row">
+      <button id="start">▶️ START CHAT</button>
+      <button id="stop" disabled>⏹️ STOP</button>
+    </div>
+    
+    <div class="spacer"></div>
+    
+    <div class="section">
+      <h3>💬 NAVIGATION</h3>
+      <ul>
+        <li><a href="index.html">📋 Chat Monitor</a></li>
+        <li><a href="chat.html">✏️ Send Messages</a></li>
+      </ul>
+    </div>
+    
+    <div class="status-bar">ProtoWebchat™ 1.0 | Visitor #99999 | Online</div>
   </div>
-
-  <section>
-    <h3>Live Output</h3>
-    <pre id="output">(no data yet)</pre>
-  </section>
-
-  <section>
-    <h3>Notes</h3>
-    <ul>
-      <li>Polling works with any static server; SSE and WebSocket require a server component.</li>
-      <li>By default SSE connects to <code>/events</code> and WebSocket to <code>ws://localhost:8080</code>.</li>
-    </ul>
-  </section>
 
   <script>
     const modeEl = document.getElementById('mode');
     const startBtn = document.getElementById('start');
     const stopBtn = document.getElementById('stop');
     const out = document.getElementById('output');
+    const out2 = document.getElementById('output2');
 
-    // State holders for the three modes. We keep references so we can stop/cleanup.
-    let pollInterval = null; // id from setInterval for polling
-    let evtSource = null;    // EventSource instance for SSE
-    let ws = null;           // WebSocket instance for WS mode
+    let pollInterval = null;
+    let pollInterval2 = null;
+    let evtSource = null;
+    let ws = null;
 
-    // append: helper that writes a timestamped single-line message to the <pre>
-    // - data: string or object (objects are JSON-stringified)
     function append(data){
       const time = new Date().toLocaleTimeString();
-      // Use textContent to avoid inserting raw HTML; safer against XSS.
       out.textContent = `[${time}] ` + (typeof data === 'string' ? data : JSON.stringify(data));
     }
 
-    /*
-      Polling implementation (client-initiated polling)
-      - Calls the `simple.txt` URL repeatedly with cache disabled.
-      - This works with any static server and is the simplest approach.
-      - Pros: works everywhere, no special server tech required.
-      - Cons: latency and extra HTTP requests when idle; not efficient for high-frequency updates.
-    */
+    function append2(data){
+      const time = new Date().toLocaleTimeString();
+      out2.textContent = `[${time}] ` + (typeof data === 'string' ? data : JSON.stringify(data));
+    }
+
     async function startPolling(){
-      // refresh: single fetch + render
       async function refresh(){
         try{
-          // `cache: 'no-store'` helps avoid browser cache when testing live updates.
-          const r = await fetch('simple.txt', { cache: 'no-store' });
+          const r = await fetch('user1.txt', { cache: 'no-store' });
           if(!r.ok) throw new Error(r.status);
           const t = await r.text();
-          append(t);
+          append(t || '(empty)');
         } catch(e){
-          // append an error message rather than throwing so UI remains responsive
           append('poll error: ' + e.message);
         }
       }
-      // run one immediate refresh, then start interval
       await refresh();
-      pollInterval = setInterval(refresh, 2000); // poll every 2s (tunable)
+      pollInterval = setInterval(refresh, 500);
     }
 
-    /*
-      SSE (Server-Sent Events)
-      - The browser opens a long-lived HTTP connection to the server (`/events`).
-      - The server pushes text events as they become available.
-      - Pros: simple one-way server->client streaming over HTTP, auto-reconnect built in.
-      - Cons: one-way (server to client), needs an SSE-capable server endpoint.
-    */
+    async function startPolling2(){
+      async function refresh(){
+        try{
+          const r = await fetch('user2.txt', { cache: 'no-store' });
+          if(!r.ok) throw new Error(r.status);
+          const t = await r.text();
+          append2(t || '(empty)');
+        } catch(e){
+          append2('poll error: ' + e.message);
+        }
+      }
+      await refresh();
+      pollInterval2 = setInterval(refresh, 500);
+    }
+
     function startSSE(){
-      // Create EventSource to the `/events` endpoint (server_sse.js implements it)
       evtSource = new EventSource('/events');
-      // onmessage receives messages where each message's `data` is the server payload.
       evtSource.onmessage = e => append(e.data);
-      // onerror will be called for network issues; we log a small message.
       evtSource.onerror = () => append('SSE error or disconnected (EventSource will retry)');
     }
 
-    /*
-      WebSocket (bi-directional)
-      - Opens a WS connection to ws://localhost:8080 (see `ws_server.js`).
-      - Messages are sent both ways; here the server periodically sends JSON ticks.
-      - Pros: low-latency, full-duplex communication.
-      - Cons: requires a WebSocket server and different URL/schema (ws:///wss://).
-    */
     function startWS(){
-      // NOTE: If you serve the page over HTTPS, use wss:// and secure the WS endpoint.
       ws = new WebSocket('ws://localhost:8080');
       ws.onopen = () => {
         append('ws open');
-        // Example: send a short message to the server on connect
         ws.send('client connected');
       };
-      // incoming messages: display the payload
       ws.onmessage = e => append(e.data);
       ws.onclose = () => append('ws closed');
       ws.onerror = () => append('ws error');
     }
 
-    // stopAll: gracefully stops any running mode and releases resources.
     function stopAll(){
       if(pollInterval){ clearInterval(pollInterval); pollInterval = null; append('stopped polling'); }
+      if(pollInterval2){ clearInterval(pollInterval2); pollInterval2 = null; append2('stopped polling'); }
       if(evtSource){ evtSource.close(); evtSource = null; append('stopped SSE'); }
       if(ws){ ws.close(); ws = null; append('stopped WS'); }
     }
 
-    // Wire up UI buttons: start and stop
     startBtn.addEventListener('click', ()=>{
-      startBtn.disabled = true; stopBtn.disabled = false; out.textContent = '';
+      startBtn.disabled = true; stopBtn.disabled = false; out.textContent = ''; out2.textContent = '';
       const mode = modeEl.value;
-      if(mode === 'poll') startPolling();
+      if(mode === 'poll') {
+        startPolling();
+        startPolling2();
+      }
       else if(mode === 'sse') startSSE();
       else if(mode === 'ws') startWS();
     });
@@ -145,5 +377,6 @@
       stopAll(); startBtn.disabled = false; stopBtn.disabled = true;
     });
   </script>
+  <!-- Created with Microsoft FrontPage 98 - ProtoWebchat(tm) 1999 -->
 </body>
 </html>
