@@ -3,11 +3,6 @@ name: Update simple.txt
 # Allow manual trigger from the Actions tab
 on:
   workflow_dispatch:
-    inputs:
-      message:
-        description: 'Message to write to simple.txt'
-        required: false
-        default: 'Updated via GitHub Actions'
 
 jobs:
   update-simple:
@@ -21,13 +16,10 @@ jobs:
         run: |
           MESSAGE="${{ github.event.inputs.message }}"
           if [ -z "$MESSAGE" ]; then
-            MESSAGE="Updated at $(date -u +'%Y-%m-%d %H:%M:%S UTC')"
-          fi
-          echo "$MESSAGE" > simple.txt
-          echo "✓ Updated simple.txt with: $MESSAGE"
-
-      # Commit and push the changes
-      - name: Commit and push
+            MESSAGE="Updated ata hardcoded message
+      - name: Update simple.txt
+        run: |
+          MESSAGE="Your custom text here": Commit and push
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
