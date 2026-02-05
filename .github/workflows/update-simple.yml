@@ -14,7 +14,7 @@ jobs:
       # Update simple.txt with a hardcoded message
       - name: Update simple.txt
         run: |
-          MESSAGE="Your custom text here"
+          MESSAGE="Push via workflows test 1"
           echo "$MESSAGE" > simple.txt
           echo "✓ Updated simple.txt with: $MESSAGE"
 
