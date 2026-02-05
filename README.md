@@ -75,6 +75,19 @@ git push origin main
 
 Then enable Pages under repo Settings → Pages → deploy from `main` branch.
 
+## Update simple.txt on Demand
+
+Use the **update-simple.yml** workflow to update `simple.txt` from GitHub without pushing code:
+
+1. Go to your repo on GitHub → **Actions** tab
+2. Select **"Update simple.txt"** workflow
+3. Click **"Run workflow"** (dropdown on the right)
+4. Optionally enter a custom message in the input field
+5. Click **"Run workflow"** again to confirm
+6. The workflow commits and pushes the change automatically
+
+The page polling `simple.txt` (using `index.html` or `github-pages.html`) will fetch the updated content on the next interval.
+
 ---
 
 **Credits**

@@ -1,1 +1,2 @@
-test
+This is a simple text file used to test displaying
+text from one file on a web page
