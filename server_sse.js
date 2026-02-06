@@ -44,6 +44,9 @@ app.get('/events', (req, res) => {
 */
 app.post('/save-message', (req, res) => {
   try {
+    // Debug logging: record method/content-type/body to help diagnose client 501s
+    console.log('/save-message called, method=', req.method, 'content-type=', req.headers['content-type']);
+    console.log('raw body:', req.body);
     const { user, message } = req.body;
     
     if (!user || !['1', '2'].includes(user)) {
@@ -75,7 +78,7 @@ app.post('/save-message', (req, res) => {
   - Accepts JSON payload { user: '1'|'2' }
   - Truncates the corresponding user file (clears history)
 */
-app.post('/clear-messages', (req, res) => {
+app.post('/clear-messages', (req, res) => { // POST function is fucking broken at the moment FIX IT!!!
   try {
     const { user } = req.body;
     if (!user || !['1', '2'].includes(user)) {
@@ -114,4 +117,6 @@ app.get('/stats', (req, res) => {
 
 // Start the server on the configured port.
 const port = process.env.PORT || 3000;
-app.listen(port, () => console.log(`SSE server running at http://localhost:${port}`));
+app.listen(port, () => console.log(`SSE server running at http://localhost:${port}`));]
+
+// this shit is broken, i dont know what happened but it just will not run

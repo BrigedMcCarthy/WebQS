@@ -82,6 +82,7 @@
   </div>
 
   <script>
+    // Elements: fetch important DOM nodes once
     const userSelect = document.getElementById('user');
     const messageTextarea = document.getElementById('message');
     const sendBtn = document.getElementById('send');
@@ -90,6 +91,8 @@
     const charCount = document.getElementById('charCount');
     const undoLastBtn = document.getElementById('undoLast');
     const downloadJSONBtn = document.getElementById('downloadJSON');
+    // copyLastSent button was removed from the HTML in a previous cleanup; try to grab it if present
+    const copyLastSentBtn = document.getElementById('copyLastSent');
 
     messageTextarea.focus();
 
@@ -99,6 +102,8 @@
       clearTimeout(autoSaveTimer);
       autoSaveTimer = setTimeout(()=>{ localStorage.setItem('pw_draft_' + userSelect.value, messageTextarea.value); }, 500);
     });
+    // Note: drafts are stored per-recipient key `pw_draft_<user>` so switching the "Send To" select
+    // restores the correct draft for that user.
 
     // Load draft on user select change
     userSelect.addEventListener('change', ()=>{
@@ -144,31 +149,38 @@
       }catch(e){ alert('Failed to download logs: '+e.message); }
     });
 
-    copyLastSentBtn.addEventListener('click', ()=>{
-      const last = document.getElementById('lastSent').textContent || '';
-      if(!last || last.includes('(none)')) return alert('No last message to copy');
-      navigator.clipboard.writeText(last).then(()=>alert('Copied'));
-    });
+    // Copy last-sent text to clipboard (only if the button exists)
+    if (copyLastSentBtn) {
+      copyLastSentBtn.addEventListener('click', ()=>{
+        const last = document.getElementById('lastSent').textContent || '';
+        if(!last || last.includes('(none)')) return alert('No last message to copy');
+        navigator.clipboard.writeText(last).then(()=>alert('Copied')).catch(()=>alert('Copy failed'));
+      });
+    }
 
     // Import JSON functionality
+    // Import local JSON export - client-side fallback
     document.getElementById('importJSON').addEventListener('click', ()=>{
       const input = document.createElement('input');
       input.type = 'file';
       input.accept = '.json';
       input.onchange = async (e)=>{
         const file = e.target.files[0];
+        if(!file) return;
         const text = await file.text();
+        let data;
         try{
-          const data = JSON.parse(text);
-          if(data.user1) fs.writeFileSync('/workspaces/WebQS/user1.txt', data.user1);
-          if(data.user2) fs.writeFileSync('/workspaces/WebQS/user2.txt', data.user2);
-          alert('Chat imported! Refresh the monitor page.');
-        }catch(err){
-          // Client-side import via fetch fallback
-          if(confirm('Server-side import unavailable. Append to current user?')) {
-            const content = (data.user1 || data.user2 || '').split('\\n').join('\\n') + '\\n[Imported from file]\\n';
-            messageTextarea.value = content;
-          }
+          data = JSON.parse(text);
+        }catch(parseErr){
+          return alert('Invalid JSON file');
+        }
+        // We cannot write server-side files from the browser; instead, offer to paste imported content into the message box
+        const combined = ((data.user1 || '') + '\n' + (data.user2 || '')).trim();
+        if(!combined) return alert('No chat content found in file');
+        if(confirm('Import will place the exported chat into your message box so you can send or copy it. Continue?')){
+          messageTextarea.value = combined + '\n[Imported]\n';
+          updateCharCount();
+          alert('Imported into message box (not saved to server).');
         }
       };
       input.click();
@@ -179,13 +191,17 @@
       Notification.requestPermission();
     }
 
-    // Helper to send desktop notification
+    // Helper to send desktop notification (wraps the Web Notifications API)
+    // This is optional and will only fire if the user granted permission.
     function notifyDesktop(title, msg) {
       if('Notification' in window && Notification.permission === 'granted') {
-        try { new Notification(title, { body: msg, icon: 'data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\"><circle cx=\"50\" cy=\"50\" r=\"40\" fill=\"%230b5ea8\"/><text x=\"50\" y=\"60\" text-anchor=\"middle\" font-size=\"40\" fill=\"white\">💬</text></svg>' }); } catch(e) {}
+        try {
+          new Notification(title, { body: msg, icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="%230b5ea8"/></svg>' });
+        } catch(e) { /* swallow errors for older browsers */ }
       }
     }
 
+    // Send button: collect form data, post to server and update UI on success/failure
     sendBtn.addEventListener('click', async () => {
       const user = userSelect.value;
       const message = messageTextarea.value.trim();
