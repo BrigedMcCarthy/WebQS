@@ -11,280 +11,106 @@
   <title>ProtoWebchat - Chat System</title>
   <style>
     * { margin: 0; padding: 0; }
-    
-    body {
-      background: repeating-linear-gradient(45deg, #ffff00, #ffff00 10px, #000080 10px, #000080 20px);
-      font-family: Comic Sans MS, Verdana, sans-serif;
-      font-size: 12px;
-      color: #000000;
-      overflow-x: hidden;
-    }
-    
-    body::before {
-      content: "★★★ WELCOME TO ProtoWebchat ™ CREATED WITH FRONTPAGE 98 ★★★";
-      display: block;
-      background: #ff0000;
-      color: #ffff00;
-      padding: 8px;
-      text-align: center;
-      font-weight: bold;
-      font-size: 14px;
-      border: 4px solid #008000;
-      border-style: ridge;
-      animation: blink 0.5s infinite;
-    }
-    
-    body::after {
-      content: "You are visitor #" counter(visitors) " | Best viewed in Internet Explorer 5.0 | 800x600 Resolution | © 1999 ProtoWebchat™";
-      display: block;
-      background: #008080;
-      color: #ffff00;
-      padding: 6px;
-      text-align: center;
-      font-size: 11px;
-      border: 3px solid #ff0000;
-      margin-top: 20px;
-    }
-    
-    .window {
-      max-width: 700px;
-      margin: 15px auto;
-      padding: 10px;
-      background: repeating-linear-gradient(90deg, #c0c0c0, #c0c0c0 20px, #ffffff 20px, #ffffff 22px);
-      border: 8px ridge;
-      border-color: #dfdfdf #808080 #808080 #dfdfdf;
-    }
-    
-    .title-bar {
-      background: linear-gradient(to right, #000080, #0000ff, #000080);
-      color: #ffff00;
-      padding: 4px 8px;
-      font-weight: bold;
-      font-size: 14px;
-      margin: -10px -10px 10px -10px;
-      text-align: center;
-      border-bottom: 4px outset #c0c0c0;
-      animation: blink 1s infinite;
-    }
-    
-    h1, h2 {
-      color: #ff0000;
-      font-size: 20px;
-      text-shadow: 2px 2px #008000;
-      margin: 10px 0;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-    }
-    
-    h3 {
-      color: #0000ff;
-      font-size: 16px;
-      margin: 12px 0 8px 0;
-      text-decoration: underline;
-      background: #ffff00;
-      padding: 4px;
-      border: 2px solid #000000;
-    }
-    
-    p {
-      margin: 8px 0;
-      line-height: 1.6;
-      background: #ffffff;
-      padding: 6px;
-      border: 2px inset #c0c0c0;
-    }
-    
-    .field-group {
-      margin: 10px 0;
-      padding: 8px;
-      background: #c0c0c0;
-      border: 3px outset #dfdfdf;
-    }
-    
-    label {
-      display: block;
-      margin-bottom: 6px;
-      font-weight: bold;
-      color: #000080;
-      text-transform: uppercase;
-      font-size: 11px;
-    }
-    
-    select {
-      background-color: #00ffff;
-      color: #000000;
-      border: 3px outset #dfdfdf;
-      padding: 4px;
-      font-family: Comic Sans MS, Verdana;
-      font-size: 11px;
-      width: 100%;
-      box-sizing: border-box;
-      font-weight: bold;
-    }
-    
-    button {
-      background: linear-gradient(to bottom, #ffff00, #ff8000);
-      color: #000000;
-      border: 3px outset #dfdfdf;
-      padding: 6px 16px;
-      font-family: Comic Sans MS, Verdana;
-      font-size: 12px;
-      font-weight: bold;
-      cursor: pointer;
-      margin-right: 6px;
-      text-transform: uppercase;
-      transition: 0.05s;
-    }
-    
-    button:active {
-      border-style: inset;
-      box-shadow: inset 2px 2px 0 #808080;
-    }
-    
-    button:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-    
-    .button-row {
-      margin: 10px 0;
-    }
-    
-    pre {
-      background-color: #000000;
-      color: #00ff00;
-      padding: 10px;
-      border: 3px inset #008000;
-      font-family: Courier New, monospace;
-      font-size: 11px;
-      white-space: pre-wrap;
-      word-wrap: break-word;
-      margin: 8px 0;
-      min-height: 60px;
-      text-shadow: 0 0 8px #00ff00;
-    }
-    
-    .status-bar {
-      background: linear-gradient(to right, #008080, #00ffff);
-      border-top: 3px ridge #c0c0c0;
-      padding: 4px 8px;
-      font-size: 11px;
-      color: #ffffff;
-      display: flex;
-      justify-content: space-between;
-      margin: 10px -10px -10px -10px;
-      font-weight: bold;
-    }
-    
-    .section {
-      margin: 12px 0;
-      padding: 8px;
-      background: #ffffff;
-      border: 4px ridge #ff00ff;
-      box-shadow: 4px 4px 0 #000000;
-    }
-    
-    ul {
-      margin: 8px 0 8px 24px;
-      padding: 8px;
-      background: #ffff00;
-      border: 3px double #000000;
-    }
-    
-    li {
-      margin: 6px 0;
-      line-height: 1.5;
-      color: #000080;
-    }
-    
-    a {
-      color: #0000ff;
-      text-decoration: underline;
-      font-weight: bold;
-    }
-    
-    a:visited {
-      color: #800080;
-    }
-    
-    a:hover {
-      background: #ffff00;
-      color: #000000;
-    }
-    
-    code {
-      background: #ffff00;
-      border: 2px solid #000080;
-      padding: 2px 4px;
-      font-family: Courier New, monospace;
-      color: #ff0000;
-      font-weight: bold;
-    }
-    
-    .spacer {
-      height: 15px;
-      background: repeating-linear-gradient(90deg, #ff0000, #ff0000 8px, #00ff00 8px, #00ff00 16px, #0000ff 16px, #0000ff 24px, #ffff00 24px, #ffff00 32px);
-      border: 3px solid #000000;
-      margin: 15px 0;
-    }
-    
-    @keyframes blink {
-      0%, 49% { opacity: 1; }
-      50%, 100% { opacity: 0.3; }
-    }
-    
-    @keyframes spin {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
-    }
+    body { background: #c0c0c0; font-family: Arial, Helvetica, sans-serif; color: #000; font-size: 14px; }
+    body::before { content: "ProtoWebchat - Chat Monitor"; display: block; background: #c0c0c0; color: #000; padding: 10px; text-align: center; font-weight: bold; font-size: 14px; border-bottom: 2px outset #dfdfdf; }
+    .window { max-width: 900px; margin: 15px auto; padding: 10px; background: #c0c0c0; border: 3px outset #dfdfdf; }
+    .title-bar { background: transparent; color: #000; padding: 6px 0; font-weight: bold; font-size: 14px; }
+    h1, h2 { color: #000; font-size: 14px; margin: 8px 0; font-weight: bold; }
+    h3 { color: #000; font-size: 13px; margin: 8px 0; font-weight: bold; }
+    label { display: block; margin-bottom: 4px; font-weight: bold; color: #000; font-size: 12px; }
+    select, textarea, input { background-color: #fff; color: #000; border: 2px inset #dfdfdf; padding: 4px; font-family: inherit; font-size: 12px; width: 100%; box-sizing: border-box; }
+    textarea { resize: vertical; min-height: 80px; }
+    button { background: #c0c0c0; color: #000; border: 2px outset #dfdfdf; padding: 4px 8px; font-weight: bold; cursor: pointer; font-size: 12px; margin-right: 4px; }
+    button:active { border-style: inset; }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    .button-row { margin: 8px 0; display: flex; gap: 4px; }
+    .field-group { margin: 8px 0; padding: 8px; background: #c0c0c0; border: 2px outset #dfdfdf; }
+    pre { background-color: #fff; color: #000; padding: 6px; border: 2px inset #dfdfdf; font-family: Courier New, monospace; font-size: 11px; white-space: pre-wrap; word-wrap: break-word; min-height: 60px; margin: 6px 0; }
+    .section { margin: 8px 0; padding: 8px; background: #c0c0c0; border: 2px outset #dfdfdf; }
+    ul { margin: 6px 0 6px 20px; padding: 0; }
+    li { margin: 4px 0; color: #000; }
+    a { color: #000080; text-decoration: underline; font-weight: bold; }
+    a:visited { color: #800080; }
+    a:hover { background: #c0c0c0; text-decoration: underline; }
+    .status-bar { border-top: 2px outset #dfdfdf; padding: 4px 8px; font-size: 11px; color: #000; display: flex; justify-content: space-between; margin-top: 8px; }
   </style>
 </head>
 <body>
-  <div class="window">
-    <div class="title-bar">📧 ProtoWebchat™ Chat Monitor 📧</div>
+  <div class="window" id="mainWindow">
+    <div class="title-bar" style="display:flex;justify-content:space-between;align-items:center">
+      <span>ProtoWebchat Chat Monitor</span>
+      <button id="helpBtn">? Help</button>
+    </div>
     
     <div class="section">
-      <h1>📧 LIVE CHAT MONITOR 🔴 CONNECTED 🔴</h1>
+      <h1>LIVE CHAT MONITOR</h1>
       
-      <div class="field-group">
-        <label>👤 USER 1 MESSAGE OUTPUT:</label>
-        <pre id="output">(waiting for messages...)</pre>
+      <div style="display:flex;gap:8px;margin-bottom:12px">
+        <input id="globalSearch" placeholder="Search all..." style="flex:1" />
+        <button id="printHTML">Print</button>
       </div>
       
       <div class="field-group">
-        <label>👥 USER 2 MESSAGE OUTPUT:</label>
-        <pre id="output2">(waiting for messages...)</pre>
+        <label>User 1 Messages</label>
+        <input id="search1" placeholder="Filter..." style="margin-bottom:6px" />
+        <pre id="output">(waiting...)</pre>
+        <div style="display:flex;gap:6px;margin-top:6px">
+          <button id="clear1">Clear</button>
+          <button id="export1">Export</button>
+          <button id="copy1">Copy</button>
+        </div>
+        <div style="color:#000;font-size:12px;margin-top:4px">Messages: <span id="count1">0</span></div>
+      </div>
+      
+      <div class="field-group">
+        <label>User 2 Messages</label>
+        <input id="search2" placeholder="Filter..." style="margin-bottom:6px" />
+        <pre id="output2">(waiting...)</pre>
+        <div style="display:flex;gap:6px;margin-top:6px">
+          <button id="clear2">Clear</button>
+          <button id="export2">Export</button>
+          <button id="copy2">Copy</button>
+        </div>
+        <div style="color:#000;font-size:12px;margin-top:4px">Messages: <span id="count2">0</span></div>
       </div>
     </div>
     
-    <div class="spacer"></div>
-    
-    <h3>⚡ CONNECTION MODE:</h3>
+    <h3 style="margin-top:16px">Connection Mode</h3>
     <div class="field-group">
-      <select id="mode">
-        <option value="poll">📧 Polling (HTTP Refresh)</option>
-        <option value="sse">📡 Server Events</option>
-        <option value="ws">🌐 WebSocket</option>
+      <select id="mode" style="margin-bottom:8px">
+        <option value="poll">Polling</option>
+        <option value="sse">Server Events</option>
+        <option value="ws">WebSocket</option>
       </select>
     </div>
     
     <div class="button-row">
-      <button id="start">▶️ START CHAT</button>
-      <button id="stop" disabled>⏹️ STOP</button>
+      <button id="start">Start</button>
+      <button id="stop" disabled>Stop</button>
     </div>
     
-    <div class="spacer"></div>
-    
-    <div class="section">
-      <h3>💬 NAVIGATION</h3>
+    <div class="section" style="margin-top:16px">
+      <h3>Navigation</h3>
       <ul>
-        <li><a href="index.html">📋 Chat Monitor</a></li>
-        <li><a href="chat.html">✏️ Send Messages</a></li>
+        <li><a href="index.html">Chat Monitor</a></li>
+        <li><a href="chat.html">Send Messages</a></li>
       </ul>
     </div>
     
-    <div class="status-bar">ProtoWebchat™ 1.0 | Visitor #99999 | Online</div>
+    <div id="statsDiv" style="margin:12px 0;padding:8px;background:#c0c0c0;border:2px outset #dfdfdf;color:#000;font-size:13px">User1: <span id="stat1">--</span> msgs | User2: <span id="stat2">--</span> msgs</div>
+    <div class="status-bar">ProtoWebchat™ 1.0 | <span id="connectionStatus">Online</span> | <span id="lastChecked">--</span></div>
   </div>
+
+  <!-- Help Modal -->
+  <div id="helpModal" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#c0c0c0;border:3px outset #dfdfdf;padding:20px;z-index:1000;max-width:500px">
+    <h3 style="color:#000;margin-bottom:12px;font-weight:bold">Keyboard Shortcuts</h3>
+    <ul style="list-style:none;padding:0;font-size:13px;color:#000;line-height:1.8;margin-left:0">
+      <li><strong>Ctrl+S</strong> - Focus search box</li>
+      <li><strong>Ctrl+1/2</strong> - Jump to User 1/2 output</li>
+    </ul>
+    <button onclick="document.getElementById('helpModal').style.display='none';document.getElementById('helpOverlay').style.display='none'" style="margin-top:12px;background:#c0c0c0;color:#000;border:2px outset #dfdfdf;padding:4px 8px;cursor:pointer;font-weight:bold">Close</button>
+  </div>
+  <div id="helpOverlay" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.3);z-index:999" onclick="document.getElementById('helpModal').style.display='none';this.style.display='none'"></div>
 
   <script>
     const modeEl = document.getElementById('mode');
@@ -292,15 +118,38 @@
     const stopBtn = document.getElementById('stop');
     const out = document.getElementById('output');
     const out2 = document.getElementById('output2');
+    const search1 = document.getElementById('search1');
+    const search2 = document.getElementById('search2');
+    const clear1 = document.getElementById('clear1');
+    const clear2 = document.getElementById('clear2');
+    const export1 = document.getElementById('export1');
+    const export2 = document.getElementById('export2');
+    const copy1 = document.getElementById('copy1');
+    const copy2 = document.getElementById('copy2');
+    const count1El = document.getElementById('count1');
+    const count2El = document.getElementById('count2');
+    const helpBtn = document.getElementById('helpBtn');
+    const helpModal = document.getElementById('helpModal');
+    const helpOverlay = document.getElementById('helpOverlay');
+    helpBtn.addEventListener('click', ()=>{ helpModal.style.display='block'; helpOverlay.style.display='block'; });
 
     let pollInterval = null;
     let pollInterval2 = null;
     let evtSource = null;
     let ws = null;
+    let soundEnabled = localStorage.getItem('pw_sound') !== '0';
+    const setSoundButton = () => {
+      // create a small control in the status bar
+      let btn = document.getElementById('soundToggle');
+      if(!btn){ btn = document.createElement('button'); btn.id='soundToggle'; btn.style.marginLeft='8px'; document.querySelector('.status-bar').appendChild(btn); }
+      btn.textContent = soundEnabled ? 'Sound: ON' : 'Sound: OFF';
+      btn.onclick = () => { soundEnabled = !soundEnabled; localStorage.setItem('pw_sound', soundEnabled? '1':'0'); setSoundButton(); };
+    };
+    setSoundButton();
 
     function append(data){
       const time = new Date().toLocaleTimeString();
-      out.textContent = `[${time}] ` + (typeof data === 'string' ? data : JSON.stringify(data));
+        monitorStatus.textContent = `[${time}] ` + (typeof data === 'string' ? data : JSON.stringify(data));
     }
 
     function append2(data){
@@ -309,12 +158,21 @@
     }
 
     async function startPolling(){
+      // Keep last fetched content so we can detect changes and notify
+      let lastDataUser1 = null;
       async function refresh(){
         try{
           const r = await fetch('user1.txt', { cache: 'no-store' });
           if(!r.ok) throw new Error(r.status);
           const t = await r.text();
-          append(t || '(empty)');
+            out.textContent = t || '(empty)';
+            out.scrollTop = out.scrollHeight;
+            if(lastDataUser1 !== null && lastDataUser1 !== t){
+              // play a small beep to notify of changes
+              if(soundEnabled){try{const ctx=new (window.AudioContext||window.webkitAudioContext)();const o=ctx.createOscillator();const g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.type='sine';o.frequency.value=880;g.gain.value=0.02;o.start(0);setTimeout(()=>{o.stop();ctx.close()},120);}catch(e){}}
+            }
+            lastDataUser1 = t;
+            updateCountsAndFilter(1, t);
         } catch(e){
           append('poll error: ' + e.message);
         }
@@ -324,12 +182,18 @@
     }
 
     async function startPolling2(){
+        let lastDataUser2 = null;
       async function refresh(){
         try{
           const r = await fetch('user2.txt', { cache: 'no-store' });
           if(!r.ok) throw new Error(r.status);
           const t = await r.text();
-          append2(t || '(empty)');
+            out2.textContent = t || '(empty)';
+            out2.scrollTop = out2.scrollHeight;
+            if(lastDataUser2 !== null && lastDataUser2 !== t){ if(soundEnabled){try{const ctx=new (window.AudioContext||window.webkitAudioContext)();const o=ctx.createOscillator();const g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.type='square';o.frequency.value=660;g.gain.value=0.02;o.start(0);setTimeout(()=>{o.stop();ctx.close()},120);}catch(e){}} }
+            lastDataUser2 = t;
+            updateCountsAndFilter(2, t);
+            lastDataUser2 = t;
         } catch(e){
           append2('poll error: ' + e.message);
         }
@@ -361,6 +225,132 @@
       if(evtSource){ evtSource.close(); evtSource = null; append('stopped SSE'); }
       if(ws){ ws.close(); ws = null; append('stopped WS'); }
     }
+
+    // Helpers for export/clear/search
+    async function downloadText(filename, text){
+      const blob = new Blob([text], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    }
+
+    async function fetchAndDownload(user){
+      const r = await fetch(`user${user}.txt`, { cache:'no-store' });
+      if(!r.ok) return alert('Failed to fetch log');
+      const t = await r.text();
+      downloadText(`user${user}_log.txt`, t || '');
+    }
+
+    async function clearHistory(user){
+      if(!confirm('Clear history for user '+user+'? This cannot be undone.')) return;
+      const r = await fetch('/clear-messages', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ user: String(user) }) });
+      if(!r.ok) return alert('Failed to clear');
+      if(user===1) out.textContent='(empty)'; else out2.textContent='(empty)';
+      updateCountsAndFilter(user, '');
+    }
+
+    function copyLast(user){
+      const target = user===1 ? out : out2;
+      const lines = (target.textContent||'').trim().split(/\n+/).filter(Boolean);
+      const last = lines.length? lines[lines.length-1] : '';
+      if(!last) return alert('No messages to copy');
+      navigator.clipboard.writeText(last).then(()=>alert('Copied'));
+    }
+
+    function updateCountsAndFilter(user, text){
+      const lines = (text||'').split(/\n/).filter(Boolean);
+      if(user===1){ count1El.textContent = lines.length; applyFilterToPre(out, search1.value); }
+      else { count2El.textContent = lines.length; applyFilterToPre(out2, search2.value); }
+    }
+
+    function applyFilterToPre(preEl, filter){
+      if(!filter){ /* nothing */ return; }
+      const lines = (preEl.textContent||'').split(/\n/).filter(Boolean);
+      const matched = lines.filter(l => l.toLowerCase().includes(filter.toLowerCase()));
+      preEl.textContent = matched.join('\n') || '(no matches)';
+    }
+
+    // wire up control buttons
+    export1.addEventListener('click', ()=>fetchAndDownload(1));
+    export2.addEventListener('click', ()=>fetchAndDownload(2));
+    clear1.addEventListener('click', ()=>clearHistory(1));
+    clear2.addEventListener('click', ()=>clearHistory(2));
+    copy1.addEventListener('click', ()=>copyLast(1));
+    copy2.addEventListener('click', ()=>copyLast(2));
+    search1.addEventListener('input', ()=>{ applyFilterToPre(out, search1.value); });
+    search2.addEventListener('input', ()=>{ applyFilterToPre(out2, search2.value); });
+
+    // Dark mode (disabled)
+    // const darkModeToggle = document.getElementById('darkModeToggle');
+    // const darkModeStyles = document.getElementById('darkModeStyles');
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e)=>{
+      if(e.ctrlKey || e.metaKey) {
+        if(e.key === '1') { e.preventDefault(); out.scrollIntoView(); }
+        if(e.key === '2') { e.preventDefault(); out2.scrollIntoView(); }
+        if(e.key.toLowerCase() === 's') { e.preventDefault(); search1.focus(); }
+      }
+    });
+
+    // Fetch and display stats
+    async function updateStats() {
+      try {
+        const r = await fetch('/stats', { cache:'no-store' });
+        if(r.ok) {
+          const data = await r.json();
+          document.getElementById('stat1').textContent = data.user1.count;
+          document.getElementById('stat2').textContent = data.user2.count;
+          document.getElementById('lastChecked').textContent = new Date().toLocaleTimeString();
+        }
+      } catch(e) { /* silent */ }
+    }
+    updateStats();
+    setInterval(updateStats, 5000);
+
+    // Global search across both users
+    const globalSearch = document.getElementById('globalSearch');
+    globalSearch.addEventListener('input', ()=>{
+      const q = globalSearch.value.toLowerCase();
+      if(!q) { out.scrollIntoView(); return; }
+      const lines1 = (out.textContent||'').split('\n').filter(l=>l.toLowerCase().includes(q));
+      const lines2 = (out2.textContent||'').split('\n').filter(l=>l.toLowerCase().includes(q));
+      const all = [...lines1.map(l=>'[User1] '+l), ...lines2.map(l=>'[User2] '+l)];
+      out.textContent = all.length ? all.join('\n') : '(no matches)';
+    });
+
+    // Print as HTML functionality
+    document.getElementById('printHTML').addEventListener('click', ()=>{
+      const html = `
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ProtoWebchat Export - ${new Date().toLocaleString()}</title>
+  <style>
+    body { font-family:Arial; max-width:900px; margin:20px; background:#c0c0c0; color:#000 }
+    h1 { color:#000; font-weight:bold }
+    .user { margin:20px 0; padding:12px; border-left:4px solid #000; background:#c0c0c0; border:2px outset #dfdfdf }
+    .user h2 { margin:0 0 8px 0; color:#000; font-weight:bold }
+    pre { background:#fff; padding:12px; border:2px inset #dfdfdf; overflow:auto; font-family:"Courier New",monospace }
+  </style>
+</head>
+<body>
+  <h1>ProtoWebchat Export</h1>
+  <p>Exported at: ${new Date().toLocaleString()}</p>
+  <div class="user">
+    <h2>User 1 Messages</h2>
+    <pre>${(out.textContent||'').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</pre>
+  </div>
+  <div class="user">
+    <h2>User 2 Messages</h2>
+    <pre>${(out2.textContent||'').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</pre>
+  </div>
+</body>
+</html>
+      `;
+      const blob = new Blob([html], { type:'text/html' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href=url; a.download=`protochat_${Date.now()}.html`; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    });
 
     startBtn.addEventListener('click', ()=>{
       startBtn.disabled = true; stopBtn.disabled = false; out.textContent = ''; out2.textContent = '';

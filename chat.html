@@ -11,225 +11,71 @@
   <title>ProtoWebchat - Send Message</title>
   <style>
     * { margin: 0; padding: 0; }
-    
-    body {
-      background: repeating-linear-gradient(90deg, #ff00ff, #ff00ff 15px, #008080 15px, #008080 30px);
-      font-family: Comic Sans MS, Verdana, sans-serif;
-      font-size: 12px;
-      color: #000000;
-      min-height: 100vh;
-    }
-    
-    body::before {
-      content: ">>>>> ProtoWebchat MESSAGE CENTER <<<< POWERED BY FRONTPAGE 3.0 >>>>";
-      display: block;
-      background: #000080;
-      color: #00ffff;
-      padding: 8px;
-      text-align: center;
-      font-weight: bold;
-      font-size: 13px;
-      border: 5px dashed #ffff00;
-      animation: blink 0.6s infinite;
-      font-family: monospace;
-    }
-    
-    .window {
-      width: 90%;
-      max-width: 550px;
-      margin: 15px auto;
-      padding: 12px;
-      background: #ffff00;
-      border: 6px ridge;
-      border-color: #ffffff #000000 #000000 #ffffff;
-      box-shadow: 8px 8px 0 #000000;
-    }
-    
-    .title-bar {
-      background: linear-gradient(to right, #ff0000, #ffff00, #ff0000);
-      color: #000080;
-      padding: 6px 8px;
-      font-weight: bold;
-      font-size: 14px;
-      margin: -12px -12px 12px -12px;
-      text-align: center;
-      border-bottom: 4px outset #ffffff;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      animation: blink 0.7s infinite;
-    }
-    
-    h2 {
-      color: #ff0000;
-      font-size: 18px;
-      margin: 8px 0;
-      text-shadow: 2px 2px #008080;
-      background: #00ffff;
-      padding: 6px;
-      border: 3px solid #000000;
-      text-transform: uppercase;
-    }
-    
-    .field-group {
-      margin: 12px 0;
-      padding: 10px;
-      background: #c0c0c0;
-      border: 4px outset #ffffff;
-      box-shadow: 3px 3px 0 #000000;
-    }
-    
-    label {
-      display: block;
-      margin-bottom: 6px;
-      font-weight: bold;
-      color: #000080;
-      text-transform: uppercase;
-      font-size: 11px;
-      text-shadow: 1px 1px #ffffff;
-    }
-    
-    select, textarea {
-      background-color: #ffffff;
-      color: #000000;
-      border: 3px outset #dfdfdf;
-      padding: 5px;
-      font-family: Comic Sans MS, Verdana, sans-serif;
-      font-size: 11px;
-      width: 100%;
-      box-sizing: border-box;
-      font-weight: bold;
-    }
-    
-    textarea {
-      resize: vertical;
-      min-height: 120px;
-      background: #ffffcc;
-    }
-    
-    button {
-      background: linear-gradient(135deg, #00ff00, #ffff00);
-      color: #000000;
-      border: 4px outset #ffffff;
-      padding: 8px 18px;
-      font-family: Comic Sans MS, Verdana, sans-serif;
-      font-size: 12px;
-      font-weight: bold;
-      cursor: pointer;
-      text-transform: uppercase;
-      box-shadow: 4px 4px 0 #000000;
-      transition: 0.02s;
-    }
-    
-    button:active {
-      border-style: inset;
-      box-shadow: inset 2px 2px 0 #000000, 2px 2px 0 #ffffff;
-    }
-    
-    .button-row {
-      margin: 12px 0;
-      display: flex;
-      gap: 6px;
-    }
-    
-    .status {
-      margin: 10px 0;
-      padding: 8px;
-      border: 4px double #000000;
-      display: none;
-      font-weight: bold;
-      text-align: center;
-      font-size: 13px;
-    }
-    
-    .status.success {
-      background-color: #00ff00;
-      color: #000000;
-      display: block;
-      animation: blink 0.5s infinite;
-    }
-    
-    .status.error {
-      background-color: #ff0000;
-      color: #ffff00;
-      display: block;
-    }
-    
-    .info-box {
-      background-color: #00ffff;
-      border: 4px ridge #000080;
-      padding: 10px;
-      margin: 12px 0;
-      font-size: 11px;
-      line-height: 1.6;
-      color: #000000;
-      font-weight: bold;
-      box-shadow: 4px 4px 0 #000000;
-    }
-    
-    .status-bar {
-      background: linear-gradient(to right, #0000ff, #ff00ff, #0000ff);
-      border-top: 4px ridge #ffffff;
-      padding: 6px 8px;
-      font-size: 11px;
-      color: #ffff00;
-      display: flex;
-      justify-content: space-between;
-      margin: 12px -12px -12px -12px;
-      font-weight: bold;
-      text-transform: uppercase;
-    }
-    
-    a {
-      color: #0000ff;
-      text-decoration: underline;
-      font-weight: bold;
-    }
-    
-    a:visited {
-      color: #800080;
-    }
-    
-    a:hover {
-      background: #ffff00;
-      color: #000080;
-    }
-    
-    @keyframes blink {
-      0%, 49% { opacity: 1; }
-      50%, 100% { opacity: 0.4; }
-    }
+    body { background: #c0c0c0; font-family: Arial, Helvetica, sans-serif; color: #000; font-size: 14px; }
+    body::before { content: "ProtoWebchat - Send Message"; display: block; background: #c0c0c0; color: #000; padding: 10px; text-align: center; font-weight: bold; font-size: 14px; border-bottom: 2px outset #dfdfdf; }
+    .window { width: 90%; max-width: 600px; margin: 15px auto; padding: 10px; background: #c0c0c0; border: 3px outset #dfdfdf; }
+    h2 { color: #000; font-size: 14px; margin: 8px 0; font-weight: bold; }
+    .field-group { margin: 8px 0; padding: 8px; background: #c0c0c0; border: 2px outset #dfdfdf; }
+    label { display: block; margin-bottom: 4px; font-weight: bold; color: #000; font-size: 12px; }
+    select, textarea, input { background-color: #fff; color: #000; border: 2px inset #dfdfdf; padding: 4px; font-family: inherit; font-size: 12px; width: 100%; box-sizing: border-box; }
+    textarea { resize: vertical; min-height: 100px; }
+    button { background: #c0c0c0; color: #000; border: 2px outset #dfdfdf; padding: 4px 8px; font-weight: bold; cursor: pointer; font-size: 12px; }
+    button:active { border-style: inset; }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    .button-row { margin: 8px 0; display: flex; gap: 4px; }
+    .status { margin: 8px 0; padding: 6px; border: 2px solid #000; display: none; font-weight: bold; text-align: center; font-size: 12px; }
+    .status.success { background-color: #c0c0c0; color: #000; display: block; border-color: #008000; }
+    .status.error { background-color: #c0c0c0; color: #c62828; display: block; border-color: #ff0000; }
+    .info-box { background-color: #c0c0c0; border: 2px inset #dfdfdf; padding: 8px; margin: 8px 0; font-size: 12px; line-height: 1.5; color: #000; }
+    .status-bar { border-top: 2px outset #dfdfdf; padding: 4px 8px; font-size: 11px; color: #000; display: flex; justify-content: space-between; margin-top: 8px; }
   </style>
 </head>
 <body>
   <div class="window">
-    <div class="title-bar">✉️ MESSAGE SEND CENTER ✉️</div>
+    <div class="title-bar">Message Send Center</div>
     
     <div class="field-group">
-      <h2>📝 NEW MESSAGE</h2>
-      <label>👤 SEND TO:</label>
+      <h2>New Message</h2>
+      <label>Send To:</label>
       <select id="user">
-        <option value="1">🔵 User 1</option>
-        <option value="2">🔴 User 2</option>
+        <option value="1">User 1</option>
+        <option value="2">User 2</option>
+      </select>
+      <label style="margin-top:8px">Template:</label>
+      <select id="templateSelect">
+        <option value="">(none)</option>
+        <option value="Hello! How are you?">Greeting</option>
+        <option value="On my way.">On My Way</option>
+        <option value="BRB - busy now.">BRB</option>
       </select>
     </div>
     
     <div class="field-group">
-      <label>💬 YOUR MESSAGE:</label>
-      <textarea id="message" placeholder="Type your message here... Press Ctrl+Enter to send!"></textarea>
+      <label>Message:</label>
+      <textarea id="message" placeholder="Type message..." maxlength="500"></textarea>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;color:#000;font-size:12px">
+        <div>Chars: <span id="charCount">0</span>/500</div>
+        <div style="display:flex;gap:4px">
+          <button id="undoLast">Undo</button>
+          <button id="downloadJSON">DL JSON</button>
+          <button id="importJSON">Import</button>
+        </div>
+      </div>
     </div>
     
     <div class="button-row">
-      <button id="send">🚀 SEND MESSAGE 🚀</button>
+      <button id="send">Send</button>
     </div>
     
     <div id="status" class="status"></div>
     
+    <div id="lastSent" class="info-box">Last sent: (none)</div>
     <div class="info-box">
-      💡 INSTRUCTIONS 💡<br>
-      ▶ Select which user to send to<br>
-      ▶ Type your message<br>
-      ▶ Click SEND or press Ctrl+Enter<br>
-      ▶ Check the monitor to see replies!
+      <strong>Instructions</strong><br>
+      • Select which user to send to<br>
+      • Type your message<br>
+      • Click SEND or press Ctrl+Enter<br>
+      • Check the monitor to see replies!
     </div>
     
     <div class="status-bar">ProtoWebchat™ 1.0 | Status: Ready | 1999</div>
@@ -240,8 +86,105 @@
     const messageTextarea = document.getElementById('message');
     const sendBtn = document.getElementById('send');
     const statusDiv = document.getElementById('status');
+    const templateSelect = document.getElementById('templateSelect');
+    const charCount = document.getElementById('charCount');
+    const undoLastBtn = document.getElementById('undoLast');
+    const downloadJSONBtn = document.getElementById('downloadJSON');
 
     messageTextarea.focus();
+
+    // Auto-save draft to localStorage (save every 500ms)
+    let autoSaveTimer;
+    messageTextarea.addEventListener('input', ()=>{
+      clearTimeout(autoSaveTimer);
+      autoSaveTimer = setTimeout(()=>{ localStorage.setItem('pw_draft_' + userSelect.value, messageTextarea.value); }, 500);
+    });
+
+    // Load draft on user select change
+    userSelect.addEventListener('change', ()=>{
+      const draft = localStorage.getItem('pw_draft_' + userSelect.value) || '';
+      messageTextarea.value = draft; updateCharCount();
+    });
+
+    // Load initial draft
+    const initialDraft = localStorage.getItem('pw_draft_' + userSelect.value);
+    if(initialDraft) messageTextarea.value = initialDraft;
+
+    // templates
+    templateSelect.addEventListener('change', ()=>{
+      if(templateSelect.value) { messageTextarea.value = templateSelect.value; updateCharCount(); }
+    });
+
+    // char counter and limit warning
+    function updateCharCount(){ charCount.textContent = messageTextarea.value.length; }
+    messageTextarea.addEventListener('input', updateCharCount);
+    updateCharCount();
+
+    // keyboard shortcut to focus message (Ctrl+M)
+    document.addEventListener('keydown', (e)=>{ if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='m'){ e.preventDefault(); messageTextarea.focus(); } });
+
+    // undo last: restore last-sent preview back to textarea
+    undoLastBtn.addEventListener('click', ()=>{
+      const last = document.getElementById('lastSent').textContent || '';
+      if(!last || last.includes('(none)')) return alert('No last message to restore');
+      // strip timestamp and "— To User X: " prefix
+      const parts = last.split('—');
+      const msgPart = parts.length>1 ? parts[1].replace(/^\s*To User \d+:\s*/,'') : last;
+      messageTextarea.value = msgPart.trim(); updateCharCount(); messageTextarea.focus();
+    });
+
+    // download both user logs as JSON
+    downloadJSONBtn.addEventListener('click', async ()=>{
+      try{
+        const r1 = await fetch('user1.txt', { cache:'no-store' }); const t1 = r1.ok ? await r1.text() : '';
+        const r2 = await fetch('user2.txt', { cache:'no-store' }); const t2 = r2.ok ? await r2.text() : '';
+        const data = { user1: t1, user2: t2, exported: new Date().toISOString() };
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href=url; a.download='protochat_export.json'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+      }catch(e){ alert('Failed to download logs: '+e.message); }
+    });
+
+    copyLastSentBtn.addEventListener('click', ()=>{
+      const last = document.getElementById('lastSent').textContent || '';
+      if(!last || last.includes('(none)')) return alert('No last message to copy');
+      navigator.clipboard.writeText(last).then(()=>alert('Copied'));
+    });
+
+    // Import JSON functionality
+    document.getElementById('importJSON').addEventListener('click', ()=>{
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = '.json';
+      input.onchange = async (e)=>{
+        const file = e.target.files[0];
+        const text = await file.text();
+        try{
+          const data = JSON.parse(text);
+          if(data.user1) fs.writeFileSync('/workspaces/WebQS/user1.txt', data.user1);
+          if(data.user2) fs.writeFileSync('/workspaces/WebQS/user2.txt', data.user2);
+          alert('Chat imported! Refresh the monitor page.');
+        }catch(err){
+          // Client-side import via fetch fallback
+          if(confirm('Server-side import unavailable. Append to current user?')) {
+            const content = (data.user1 || data.user2 || '').split('\\n').join('\\n') + '\\n[Imported from file]\\n';
+            messageTextarea.value = content;
+          }
+        }
+      };
+      input.click();
+    });
+
+    // Request desktop notification permission on load
+    if('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
+
+    // Helper to send desktop notification
+    function notifyDesktop(title, msg) {
+      if('Notification' in window && Notification.permission === 'granted') {
+        try { new Notification(title, { body: msg, icon: 'data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\"><circle cx=\"50\" cy=\"50\" r=\"40\" fill=\"%230b5ea8\"/><text x=\"50\" y=\"60\" text-anchor=\"middle\" font-size=\"40\" fill=\"white\">💬</text></svg>' }); } catch(e) {}
+      }
+    }
 
     sendBtn.addEventListener('click', async () => {
       const user = userSelect.value;
@@ -252,27 +195,40 @@
         return;
       }
 
-      try {
-        const response = await fetch('/save-message', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ user, message })
-        });
+        try {
+          const response = await fetch('/save-message', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user, message })
+          });
 
-        const result = await response.json();
+          // Be tolerant of empty or non-JSON responses to avoid 'Unexpected end of JSON input'
+          let result = {};
+          try {
+            const text = await response.text();
+            result = text ? JSON.parse(text) : {};
+          } catch (parseErr) {
+            // ignore parse error, keep result as empty object
+            result = {};
+          }
 
-        if (!response.ok) {
-          throw new Error(result.error || 'Failed to send message');
-        }
+          if (!response.ok) {
+            throw new Error(result.error || `Failed to send message (status ${response.status})`);
+          }
 
-        showStatus('Message sent to User ' + user, 'success');
-        messageTextarea.value = '';
+          showStatus('Message sent to User ' + user, 'success');
+          // Update last-sent preview
+          const ts = new Date().toLocaleTimeString();
+          const last = document.getElementById('lastSent');
+          if(last) last.textContent = `${ts} — To User ${user}: ${message}`;
+          messageTextarea.value = '';
+        localStorage.setItem('pw_draft_' + user, '');
         messageTextarea.focus();
-      } catch (err) {
-        showStatus('Error: ' + err.message, 'error');
-      }
+        // Desktop notification
+        notifyDesktop('ProtoWebchat', 'Message sent to User ' + user);
+        } catch (err) {
+          showStatus('Error: ' + err.message, 'error');
+        }
     });
 
     messageTextarea.addEventListener('keydown', (e) => {

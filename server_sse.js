@@ -57,13 +57,58 @@ app.post('/save-message', (req, res) => {
     const filename = `user${user}.txt`;
     const filepath = path.join(__dirname, filename);
     
-    // Write the message to the file
-    fs.writeFileSync(filepath, String(message), 'utf8');
-    
-    res.json({ success: true, file: filename });
+    // Append the message with a timestamp so we keep history
+    const timestamp = new Date().toISOString();
+    const entry = `[${timestamp}] ${message.replace(/\r?\n/g, ' ')}\n`;
+    fs.appendFileSync(filepath, entry, 'utf8');
+
+    // Return the appended entry so clients can display immediately if desired
+    res.json({ success: true, file: filename, entry });
   } catch (err) {
     console.error('Error saving message:', err);
     res.status(500).json({ error: 'Failed to save message: ' + err.message });
+  }
+});
+
+/*
+  POST endpoint: /clear-messages
+  - Accepts JSON payload { user: '1'|'2' }
+  - Truncates the corresponding user file (clears history)
+*/
+app.post('/clear-messages', (req, res) => {
+  try {
+    const { user } = req.body;
+    if (!user || !['1', '2'].includes(user)) {
+      return res.status(400).json({ error: 'Invalid user. Must be "1" or "2"' });
+    }
+    const filename = `user${user}.txt`;
+    const filepath = path.join(__dirname, filename);
+    fs.writeFileSync(filepath, '', 'utf8');
+    return res.json({ success: true, file: filename });
+  } catch (err) {
+    console.error('Error clearing messages:', err);
+    return res.status(500).json({ error: 'Failed to clear messages: ' + err.message });
+  }
+});
+
+// Simple status endpoint for health checks
+app.get('/status', (req, res) => {
+  res.json({ ok: true, time: new Date().toISOString() });
+});
+
+// GET /stats — return stats about messages for both users
+app.get('/stats', (req, res) => {
+  try {
+    const stat = (userNum) => {
+      const filepath = path.join(__dirname, `user${userNum}.txt`);
+      if (!fs.existsSync(filepath)) return { count: 0, chars: 0 };
+      const content = fs.readFileSync(filepath, 'utf8');
+      const lines = content.trim().split('\n').filter(Boolean);
+      return { count: lines.length, chars: content.length };
+    };
+    res.json({ user1: stat(1), user2: stat(2), timestamp: new Date().toISOString() });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to compute stats' });
   }
 });
 

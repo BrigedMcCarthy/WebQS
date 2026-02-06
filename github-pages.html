@@ -5,13 +5,16 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>GitHub Pages Live Update</title>
   <style>
-    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;max-width:900px;margin:24px}
+    /* Simplified neutral grey / muted blue palette */
+    :root{--bg:#f4f6f8;--panel:#ffffff;--accent:#0b5ea8;--muted:#666;--border:#d9dce0}
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;max-width:900px;margin:24px;background:var(--bg);color:#111}
     header{display:flex;align-items:center;gap:12px}
-    pre{background:#f7f7f7;padding:12px;border-radius:6px;white-space:pre-wrap}
+    pre{background:#fff;padding:12px;border:1px solid var(--border);border-radius:6px;white-space:pre-wrap}
     .controls{margin:12px 0}
-    button{margin-right:8px}
-    .status{background:#e8f5e9;padding:8px;border-radius:4px;margin-top:12px}
-    .error{background:#ffebee;color:#c62828}
+    button{margin-right:8px;background:var(--accent);color:#fff;border:none;padding:6px 10px;border-radius:4px}
+    .status{background:#fff;padding:8px;border:1px solid var(--border);border-radius:4px;margin-top:12px;color:var(--muted)}
+    .error{background:#fff;padding:8px;border:1px solid #f1c0c0;color:#c62828}
+    a{color:var(--accent)}
   </style>
 </head>
 <body>
