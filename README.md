@@ -90,8 +90,3 @@ The page polling `simple.txt` (using `index.html` or `github-pages.html`) will f
 
 ---
 
-**Credits**
-
-- Template created and documented by the project owner with assistance from GitHub Copilot.
-
-If you'd prefer a different credit line or additional author information, let me know and I can update this.
